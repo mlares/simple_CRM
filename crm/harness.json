@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "project_name": "CRM",
+  "primary_branch": "main",
+  "license": "MIT",
+  "state_file": "feature_list.json",
+  "progress_directory": "progress",
+  "test_command": "",
+  "verification": {
+    "required_before_done": true,
+    "allow_documented_manual_verification": true
+  }
+}

@@ -1,0 +1,42 @@
+[project]
+name = "simple-crm"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Marcelo Lares", email = "marcelo.lares@gmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "argon2-cffi>=25.1.0",
+    "dj-database-url>=3.1.2",
+    "django>=5.2,<5.3",
+    "django-filter>=26.1",
+    "django-htmx>=1.29.0",
+    "gunicorn>=26.0.0",
+    "openpyxl>=3.1.5",
+    "phonenumbers>=9.0.36",
+    "psycopg[binary]>=3.2,<4",
+    "python-dateutil>=2.9.0.post0",
+    "whitenoise>=6.12.0",
+]
+
+[project.scripts]
+simple-crm = "simple_crm:main"
+
+[build-system]
+requires = ["uv_build>=0.12.1,<0.13.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "django-stubs>=6.0.9",
+    "djlint>=1.44.1",
+    "factory-boy>=3.3.3",
+    "mypy>=2.3.0",
+    "pip-audit>=2.10.1",
+    "pytest>=9.1.1",
+    "pytest-cov>=7.1.0",
+    "pytest-django>=4.13.0",
+    "ruff>=0.16.2",
+]

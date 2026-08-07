@@ -1,0 +1,8 @@
+# Runtime artifacts from the harness validator.
+__pycache__/
+*.py[cod]
+
+# Local agent/runtime state that should not be committed unless intentional.
+.agent-runtime/
+.codex/
+.claude/local/
