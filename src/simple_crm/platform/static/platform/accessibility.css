@@ -1,0 +1,40 @@
+/* Small, local defaults for keyboard visibility and touch-friendly controls. */
+:where(a, button, input, select, textarea, summary) {
+  min-height: 2.75rem;
+}
+
+:where(a, button, summary) {
+  display: inline-flex;
+  align-items: center;
+}
+
+:where(a, button, input, select, textarea, summary):focus-visible {
+  outline: 0.2rem solid #084298;
+  outline-offset: 0.2rem;
+}
+
+.skip-link {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  z-index: 10;
+  padding: 0.75rem 1rem;
+  color: #fff;
+  background: #212529;
+  transform: translateY(-150%);
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+@media (max-width: 575.98px) {
+  .container {
+    --bs-gutter-x: 1.5rem;
+  }
+
+  .table-responsive {
+    border: 1px solid var(--bs-border-color);
+    border-radius: 0.375rem;
+  }
+}

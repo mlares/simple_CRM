@@ -1,10 +1,10 @@
 [project]
 name = "simple-crm"
 version = "0.1.0"
-description = "Add your description here"
+description = "CRM simple para el equipo comercial"
 readme = "README.md"
 authors = [
-    { name = "Marcelo Lares", email = "marcelo.lares@gmail.com" }
+    { name = "Marcelo Lares", email = "marcelo.lares@gmail.com" },
 ]
 requires-python = ">=3.12"
 dependencies = [
@@ -20,9 +20,6 @@ dependencies = [
     "python-dateutil>=2.9.0.post0",
     "whitenoise>=6.12.0",
 ]
-
-[project.scripts]
-simple-crm = "simple_crm:main"
 
 [build-system]
 requires = ["uv_build>=0.12.1,<0.13.0"]
@@ -40,3 +37,54 @@ dev = [
     "pytest-django>=4.13.0",
     "ruff>=0.16.2",
 ]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "simple_crm.config.settings.test"
+pythonpath = ["src"]
+testpaths = ["tests", "crm/tests"]
+addopts = ["--strict-config", "--strict-markers"]
+
+[tool.coverage.run]
+branch = true
+source = ["simple_crm"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+
+[tool.ruff]
+target-version = "py312"
+line-length = 88
+extend-exclude = [
+    "crm/scripts/harness_check.py",
+    "crm/tests",
+    "src/simple_crm/**/migrations",
+]
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I"]
+
+[tool.ruff.lint.per-file-ignores]
+"src/simple_crm/config/settings/*.py" = ["F403", "F405"]
+
+[tool.mypy]
+python_version = "3.12"
+plugins = ["mypy_django_plugin.main"]
+check_untyped_defs = true
+disallow_untyped_defs = true
+no_implicit_optional = true
+show_error_codes = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+
+[tool.django-stubs]
+django_settings_module = "simple_crm.config.settings.test"
+
+[[tool.mypy.overrides]]
+module = ["whitenoise.*"]
+ignore_missing_imports = true
+
+[tool.djlint]
+profile = "django"
+indent = 2
+max_line_length = 88

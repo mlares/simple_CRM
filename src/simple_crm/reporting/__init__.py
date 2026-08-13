@@ -1,0 +1,1 @@
+"""Reporting Django app."""

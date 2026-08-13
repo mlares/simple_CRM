@@ -1,0 +1,106 @@
+{
+  "schema_version": 1,
+  "feature_id": "CRM-003",
+  "requirement_ids": [
+    "CRM-003-R01",
+    "CRM-003-R02",
+    "CRM-003-R03",
+    "CRM-003-R04",
+    "CRM-003-R05"
+  ],
+  "acceptance_ids": [
+    "CRM-003-AC01",
+    "CRM-003-AC02",
+    "CRM-003-AC03",
+    "CRM-003-AC04"
+  ],
+  "dependencies": [
+    "CRM-002"
+  ],
+  "allowed_scope": [
+    ".env.example",
+    ".gitignore",
+    "README.md",
+    "pyproject.toml",
+    "uv.lock",
+    "THIRD_PARTY_LICENSES/",
+    "scripts/verify-fast.sh",
+    "scripts/verify-clean.sh",
+    "scripts/verify-postgres.sh",
+    "scripts/verify-static.sh",
+    "scripts/verify-vendored-assets.sh",
+    "scripts/verify-repository-safety.sh",
+    "src/simple_crm/config/",
+    "src/simple_crm/platform/migrations/",
+    "src/simple_crm/platform/static/",
+    "src/simple_crm/platform/templates/",
+    "tests/config/",
+    "tests/integration/",
+    "tests/platform/",
+    "crm/docs/architecture.md",
+    "crm/docs/conventions.md",
+    "crm/docs/verification.md",
+    "crm/progress/impl_CRM-003.md"
+  ],
+  "out_of_scope": [
+    "crm/feature_list.json",
+    "crm/progress/current.md",
+    "crm/progress/history.md",
+    "crm/progress/tasks/CRM-003.json",
+    "crm/progress/validation_CRM-003.md",
+    "crm/AGENTS.md",
+    "crm/agents/",
+    "crm/adapters/",
+    "crm/harness.json",
+    "crm/scripts/harness_check.py",
+    "crm/tests/",
+    "src/simple_crm/__pycache__/",
+    "Sales-domain models, migrations, fixtures, and customer data",
+    "Production provider, database, or cloud provisioning",
+    "CDN-hosted runtime assets, Node.js, and frontend build tooling",
+    "Destructive reset of any database not explicitly dedicated to CRM-003 tests"
+  ],
+  "baseline_revision": "fcbe3b4ea14e155084019f9248a909826397d188",
+  "baseline_note": "Dirty worktree after completed CRM-001, CRM-023, and CRM-002. Preserve every existing harness and Django change plus the staged deletion of src/simple_crm/__pycache__/__init__.cpython-312.pyc. Docker CLI exists but its daemon socket is permission denied; docker compose and PostgreSQL client/server tools are absent; DATABASE_URL is unset. Implement the PostgreSQL 18 acceptance path, but do not claim CRM-003-AC01 passed without executing it against an actual disposable PostgreSQL 18 database.",
+  "implementation_report": "progress/impl_CRM-003.md",
+  "validation_report": "progress/validation_CRM-003.md",
+  "implementer": "crm003_postgres_implementer_terra",
+  "validator": "crm002_foundation_validator",
+  "agent_assignments": {
+    "orchestrator": {
+      "agent_id": "crm002_orchestrator",
+      "model": "gpt-5.6-sol",
+      "reasoning_effort": "high",
+      "source": "role_default"
+    },
+    "implementer": {
+      "agent_id": "crm003_postgres_implementer_terra",
+      "model": "gpt-5.6-terra",
+      "reasoning_effort": "high",
+      "source": "role_default"
+    },
+    "validator": {
+      "agent_id": "crm002_foundation_validator",
+      "model": "gpt-5.6-sol",
+      "reasoning_effort": "high",
+      "source": "role_default"
+    }
+  },
+  "postgres_acceptance_runtime": "A disposable empty PostgreSQL 18 database is available through an ephemeral environment handoff for the independent validator. Do not persist or print its connection URL; approval still requires the exact acceptance command to pass.",
+  "postgres_acceptance_command": "UV_CACHE_DIR=/tmp/uv-cache timeout 120s bash scripts/verify-postgres.sh",
+  "verification_commands": [
+    "timeout 60s ./crm/init.sh",
+    "PYTHONDONTWRITEBYTECODE=1 .venv/bin/ruff check .",
+    "PYTHONDONTWRITEBYTECODE=1 .venv/bin/ruff format --check .",
+    "PYTHONDONTWRITEBYTECODE=1 .venv/bin/mypy src",
+    "PYTHONDONTWRITEBYTECODE=1 .venv/bin/pytest -q",
+    "DJANGO_SETTINGS_MODULE=simple_crm.config.settings.test PYTHONDONTWRITEBYTECODE=1 .venv/bin/python manage.py check",
+    "DJANGO_SETTINGS_MODULE=simple_crm.config.settings.test PYTHONDONTWRITEBYTECODE=1 .venv/bin/python manage.py makemigrations --check --dry-run",
+    "timeout 60s bash scripts/verify-static.sh",
+    "bash scripts/verify-vendored-assets.sh",
+    "bash scripts/verify-repository-safety.sh",
+    "UV_CACHE_DIR=/tmp/uv-cache timeout 120s bash scripts/verify-clean.sh",
+    "UV_CACHE_DIR=/tmp/uv-cache timeout 120s bash scripts/verify-postgres.sh",
+    "git diff --check"
+  ]
+}

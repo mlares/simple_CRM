@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+  <head>
+    {% load static %}
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description"
+          content="Filtros y vistas guardadas para consultar leads autorizados.">
+    <title>Segmentos — CRM de Ventas</title>
+    <link rel="stylesheet"
+          href="{% static 'vendor/bootstrap/5.3.8/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'platform/accessibility.css' %}">
+  </head>
+  <body class="bg-body-tertiary">
+    <a class="skip-link" href="#contenido">Saltar al contenido principal</a>
+    <header class="border-bottom bg-white">
+      <div class="container py-3">
+        <nav class="d-flex flex-wrap gap-3 align-items-center"
+             aria-label="Navegación principal">
+          <a class="fw-semibold text-decoration-none"
+             href="{% url 'platform:home' %}">CRM de Ventas</a>
+          {% for item in nav_items %}
+            {% if item.available %}<a href="{{ item.url }}">{{ item.label }}</a>{% else %}<span class="text-secondary" aria-disabled="true">{{ item.label }}</span>{% endif %}
+          {% endfor %}
+        </nav>
+      </div>
+    </header>
+    <main id="contenido" class="container py-4">
+      <div class="d-flex justify-content-between align-items-end mb-4">
+        <div>
+          <p class="text-secondary mb-1">Consulta guiada</p>
+          <h1 class="h2 mb-0">Segmentos</h1>
+        </div>
+        {% if page %}<span class="badge text-bg-light">{{ page.total }} resultados</span>{% endif %}
+      </div>
+      {% if error %}<div class="alert alert-warning" role="alert">{{ error }}</div>{% endif %}
+      <section class="card shadow-sm mb-4" aria-labelledby="filters-title">
+        <div class="card-body">
+          <h2 id="filters-title" class="h5">Filtros</h2>
+          <form method="get" action="{% url 'platform:segments' %}" class="row g-3">
+            <div class="col-12 col-md-3"><label class="form-label" for="stage">Etapa</label><select class="form-select" id="stage" name="stage"><option value="">Todas</option>{% for option in stages %}<option value="{{ option.code }}"
+        {% if selected.stage == option.code %} selected{% endif %}>{{ option.label }}</option>{% endfor %}</select></div>
+            <div class="col-12 col-md-3"><label class="form-label" for="campaign">Campaña</label><select class="form-select" id="campaign" name="campaign"><option value="">Todas</option>{% for option in campaigns %}<option value="{{ option.code }}"
+        {% if selected.campaign == option.code %} selected{% endif %}>{{ option.label }}</option>{% endfor %}</select></div>
+            <div class="col-12 col-md-3"><label class="form-label" for="readiness">Preparación de datos</label><select class="form-select" id="readiness" name="readiness"><option value="">Todas</option><option value="CONTACTABLE"
+        {% if selected.readiness == "CONTACTABLE" %} selected{% endif %}>Contactable</option><option value="VERIFIED"
+        {% if selected.readiness == "VERIFIED" %} selected{% endif %}>Verificado</option><option value="NEEDS_RESEARCH"
+        {% if selected.readiness == "NEEDS_RESEARCH" %} selected{% endif %}>Requiere investigación</option></select></div>
+            <div class="col-12 col-md-3"><label class="form-label" for="sort">Orden</label><select class="form-select" id="sort" name="sort"><option value="created_desc"
+        {% if selected.sort != "lead_number" and selected.sort != "stage" %} selected{% endif %}>Más nuevos primero</option><option value="lead_number"
+        {% if selected.sort == "lead_number" %} selected{% endif %}>Número de lead</option><option value="stage"{% if selected.sort == "stage" %} selected{% endif %}>Etapa y número</option></select></div>
+            <div class="col-12 d-flex gap-2"><button class="btn btn-primary" type="submit">Aplicar filtros</button><a class="btn btn-outline-secondary"
+   href="{% url 'platform:segments' %}">Restablecer</a></div>
+          </form>
+        </div>
+      </section>
+      <section class="card shadow-sm mb-4" aria-labelledby="saved-title">
+        <div class="card-body">
+          <h2 id="saved-title" class="h5">Vistas guardadas</h2>
+          {% for view in saved_views %}<a class="badge text-bg-light text-decoration-none me-2"
+   href="?view={{ view.pk }}">{{ view.name }}</a>{% empty %}<p class="text-secondary mb-0">Todavía no hay vistas guardadas.</p>{% endfor %}
+        </div>
+      </section>
+      {% if page %}
+        <p class="text-secondary" aria-live="polite"><strong>Resumen:</strong> {{ page.summary }} · <strong>Orden:</strong> {{ page.sort_label }}</p>
+        {% if page.results %}<section class="row g-3" aria-label="Resultados del segmento">{% for lead in page.results %}<div class="col-12 col-lg-6"><article class="card h-100"><div class="card-body"><h2 class="h5"><a href="{% url 'platform:lead_detail' lead.lead_number %}">{{ lead.lead_number }}</a></h2><p class="mb-0">{{ lead.current_stage.label }} · {{ lead.campaign.label }}</p></div></article></div>{% endfor %}</section>{% else %}<div class="alert alert-info">No hay leads que coincidan con los filtros.</div>{% endif %}
+      {% endif %}
+    </main>
+    <script src="{% static 'vendor/htmx/2.0.10/htmx.min.js' %}" defer></script>
+  </body>
+</html>

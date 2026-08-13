@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "feature_id": "CRM-018",
+  "requirement_ids": [
+    "CRM-018-R01",
+    "CRM-018-R02",
+    "CRM-018-R03",
+    "CRM-018-R04",
+    "CRM-018-R05",
+    "CRM-018-R06"
+  ],
+  "acceptance_ids": [
+    "CRM-018-AC01",
+    "CRM-018-AC02",
+    "CRM-018-AC03",
+    "CRM-018-AC04",
+    "CRM-018-AC05"
+  ],
+  "dependencies": ["CRM-009", "CRM-011", "CRM-012", "CRM-013", "CRM-014"],
+  "allowed_scope": [
+    "README.md",
+    "crm/docs/architecture.md",
+    "crm/docs/conventions.md",
+    "crm/docs/verification.md",
+    "crm/docs/accessibility.md",
+    "src/simple_crm/platform/views.py",
+    "src/simple_crm/platform/urls.py",
+    "src/simple_crm/platform/static/platform/accessibility.css",
+    "src/simple_crm/platform/templates/platform/*.html",
+    "src/simple_crm/identity/templates/identity/local_login.html",
+    "tests/platform/test_accessibility_contract.py",
+    "crm/progress/impl_CRM-018.md"
+  ],
+  "out_of_scope": [
+    "PROJECT_STATUS.html",
+    "crm/feature_list.json",
+    "crm/progress/current.md",
+    "crm/progress/history.md",
+    "crm/progress/tasks/CRM-018.json",
+    "crm/progress/validation_CRM-018.md",
+    "crm/AGENTS.md",
+    "crm/agents/",
+    "crm/adapters/",
+    "crm/harness.json",
+    "crm/scripts/",
+    "Native mobile applications",
+    "Offline synchronization",
+    "Replacing the server-rendered form flow with a SPA",
+    "Inventing clinical or patient workflows"
+  ],
+  "baseline_revision": "fcbe3b4ea14e155084019f9248a909826397d188",
+  "baseline_note": "Dirty completed-feature worktree after CRM-001 through CRM-017. Preserve existing changes and PROJECT_STATUS.html. CRM-018 owns accessible Spanish presentation, responsive touch targets, progressive-disclosure guidance, no-JavaScript-compatible navigation/forms, contextual help, and the maintained glossary.",
+  "implementation_report": "progress/impl_CRM-018.md",
+  "validation_report": "progress/validation_CRM-018.md",
+  "implementer": "crm018_accessibility_implementer_terra",
+  "validator": "crm018_accessibility_validator_sol",
+  "agent_assignments": {
+    "orchestrator": {
+      "agent_id": "crm018_accessibility_orchestrator_sol",
+      "model": "gpt-5.6-sol",
+      "reasoning_effort": "high",
+      "source": "role_default"
+    },
+    "implementer": {
+      "agent_id": "crm018_accessibility_implementer_terra",
+      "model": "gpt-5.6-terra",
+      "reasoning_effort": "high",
+      "source": "role_default"
+    },
+    "validator": {
+      "agent_id": "crm018_accessibility_validator_sol",
+      "model": "gpt-5.6-sol",
+      "reasoning_effort": "high",
+      "source": "role_default"
+    }
+  },
+  "architecture_decision": "Keep critical flows server-rendered and progressively enhanced. A local, small accessibility stylesheet supplies visible focus and touch-size defaults; a static Spanish help/guide page explains the workflow and glossary. Normal links and forms remain usable without JavaScript.",
+  "verification_commands": [
+    "timeout 60s ./crm/init.sh",
+    "PYTHONDONTWRITEBYTECODE=1 .venv/bin/ruff check .",
+    "PYTHONDONTWRITEBYTECODE=1 .venv/bin/ruff format --check .",
+    "PYTHONDONTWRITEBYTECODE=1 .venv/bin/mypy src",
+    "PYTHONDONTWRITEBYTECODE=1 .venv/bin/pytest -q",
+    "PYTHONDONTWRITEBYTECODE=1 .venv/bin/pytest -q tests/platform/test_accessibility_contract.py",
+    "git diff --check"
+  ]
+}

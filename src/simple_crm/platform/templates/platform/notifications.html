@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+  <head>
+    {% load static %}
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description"
+          content="Preferencias personales de recordatorios y notificaciones del CRM.">
+    <title>Notificaciones — CRM de Ventas</title>
+    <link rel="stylesheet"
+          href="{% static 'vendor/bootstrap/5.3.8/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'platform/accessibility.css' %}">
+  </head>
+  <body class="bg-body-tertiary">
+    <a class="skip-link" href="#contenido">Saltar al contenido principal</a>
+    <header class="border-bottom bg-white">
+      <div class="container py-3">
+        <nav class="d-flex flex-wrap gap-3 align-items-center"
+             aria-label="Navegación principal">
+          <a class="fw-semibold text-decoration-none"
+             href="{% url 'platform:home' %}">CRM de Ventas</a>
+          {% for item in nav_items %}
+            {% if item.available %}<a href="{{ item.url }}">{{ item.label }}</a>{% else %}<span class="text-secondary" aria-disabled="true">{{ item.label }}</span>{% endif %}
+          {% endfor %}
+        </nav>
+      </div>
+    </header>
+    <main id="contenido" class="container py-4">
+      <div class="mb-4">
+        <p class="text-secondary mb-1">Preferencias personales</p>
+        <h1 class="h2 mb-0">Notificaciones</h1>
+      </div>
+      {% if error %}<div class="alert alert-warning" role="alert">{{ error }}</div>{% endif %}
+      {% if saved %}<div class="alert alert-success" role="status">Preferencias guardadas.</div>{% endif %}
+      <form method="post"
+            class="card card-body shadow-sm mb-4"
+            aria-labelledby="preferences-title">
+        {% csrf_token %}
+        <h2 id="preferences-title" class="h5">Cómo recibir recordatorios</h2>
+        <div class="form-check mb-3">
+          <input class="form-check-input"
+                 type="checkbox"
+                 id="digest_enabled"
+                 name="digest_enabled"
+                 {% if preferences.digest_enabled %}checked{% endif %}>
+          <label class="form-check-label" for="digest_enabled">Recibir resumen diario</label>
+          <div class="form-text">Está activado de forma predeterminada para evitar avisos excesivos.</div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="daily_digest_hour">Hora local del resumen</label>
+          <input class="form-control"
+                 type="number"
+                 min="0"
+                 max="23"
+                 id="daily_digest_hour"
+                 name="daily_digest_hour"
+                 value="{{ preferences.daily_digest_hour }}">
+          <div class="form-text">Use un valor entre 0 y 23.</div>
+        </div>
+        <div class="form-check mb-3">
+          <input class="form-check-input"
+                 type="checkbox"
+                 id="escalation_enabled"
+                 name="escalation_enabled"
+                 {% if preferences.escalation_enabled %}checked{% endif %}>
+          <label class="form-check-label" for="escalation_enabled">Permitir escaladas operativas</label>
+          <div class="form-text">La activación está restringida a identidades administrativas.</div>
+        </div>
+        <button class="btn btn-primary align-self-start" type="submit">Guardar preferencias</button>
+      </form>
+      {% if failed_jobs %}
+        <section class="card shadow-sm" aria-labelledby="jobs-title">
+          <div class="card-body">
+            <h2 id="jobs-title" class="h5">Trabajos que requieren revisión</h2>
+            <p class="text-secondary">Sólo se muestran datos operativos; el contenido personal y las credenciales permanecen ocultos.</p>
+            <div class="table-responsive">
+              <table class="table align-middle">
+                <thead>
+                  <tr>
+                    <th>Tipo</th>
+                    <th>Estado</th>
+                    <th>Intentos</th>
+                    <th>Programado</th>
+                    <th>Último error</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for job in failed_jobs %}<tr><td>{{ job.job_type }}</td><td>{{ job.state }}</td><td>{{ job.attempts }}/{{ job.max_attempts }}</td><td>{{ job.scheduled_at|date:"j/m/Y H:i" }}</td><td>{{ job.last_error }}</td></tr>{% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      {% endif %}
+    </main>
+    <script src="{% static 'vendor/htmx/2.0.10/htmx.min.js' %}" defer></script>
+  </body>
+</html>

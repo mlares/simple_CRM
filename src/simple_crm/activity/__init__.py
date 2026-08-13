@@ -1,0 +1,1 @@
+"""Activity tracking Django app."""

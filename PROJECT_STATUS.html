@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Current delivery and verification status for DigPatho Sales Hub.">
+    <title>DigPatho Sales Hub — Project Status</title>
+    <style>
+      :root { color-scheme: light; --ink:#172033; --muted:#5d6a7e; --surface:#fff; --canvas:#f4f7fb; --line:#dce3ed; --success:#157347; --success-bg:#eaf7ef; --accent:#275dad; --warn:#8a5a00; --warn-bg:#fff7df; }
+      * { box-sizing: border-box; }
+      body { margin:0; background:var(--canvas); color:var(--ink); font:16px/1.55 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+      main { max-width:1000px; margin:0 auto; padding:3rem 1.25rem; }
+      header, section { background:var(--surface); border:1px solid var(--line); border-radius:14px; }
+      header { padding:2.25rem; border-top:6px solid var(--accent); }
+      section { margin-top:1.25rem; padding:1.5rem 1.75rem; }
+      h1,h2,h3 { line-height:1.2; margin:0 0 .75rem; }
+      h1 { font-size:clamp(2rem,5vw,3.1rem); }
+      h2 { font-size:1.35rem; }
+      h3 { font-size:1rem; }
+      p { margin:.55rem 0; }
+      .lead { color:var(--muted); font-size:1.12rem; max-width:62rem; }
+      .badge { display:inline-block; padding:.25rem .7rem; border-radius:999px; background:var(--success-bg); color:var(--success); font-weight:700; }
+      .badge.active { background:var(--warn-bg); color:var(--warn); }
+      .metrics { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:.75rem; margin-top:1.5rem; }
+      .metric { padding:1rem; border:1px solid var(--line); border-radius:10px; }
+      .metric strong { display:block; font-size:1.45rem; color:var(--accent); }
+      .muted { color:var(--muted); }
+      ul { padding-left:1.25rem; }
+      li + li { margin-top:.45rem; }
+      table { width:100%; border-collapse:collapse; margin-top:.75rem; }
+      th,td { padding:.75rem; text-align:left; vertical-align:top; border-bottom:1px solid var(--line); }
+      th { color:var(--muted); font-size:.88rem; }
+      code { padding:.1rem .3rem; border-radius:4px; background:#eef2f7; font-size:.9em; }
+      a { color:var(--accent); }
+      .notice { padding:1rem; border-left:4px solid #d39e00; background:var(--warn-bg); }
+      footer { color:var(--muted); font-size:.9rem; padding:1.5rem .25rem 0; }
+      @media (max-width:700px) { table { display:block; overflow-x:auto; white-space:normal; } th,td { min-width:10rem; } }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <p class="badge active">20 complete · CRM-020 changes requested</p>
+        <h1>DigPatho Sales Hub</h1>
+        <p class="lead">
+          The CRM backlog is complete through application security (CRM-019). CRM-020 has implemented
+          the deployment image, observability, operations contracts, and recovery drill adapter; it is
+          code-complete after its bounded revision, but independent validation still requires deployment-owned evidence before closure. Twenty of
+          twenty-three features are formally complete (87.0%); counting CRM-020 at implementation or later,
+          91.3% of the planned feature set has reached implementation or later.
+        </p>
+        <div class="metrics" aria-label="Project metrics">
+          <div class="metric"><strong>20</strong> completed features</div>
+          <div class="metric"><strong>1</strong> feature with changes requested</div>
+          <div class="metric"><strong>2</strong> pending features</div>
+          <div class="metric"><strong>229</strong> full-harness tests</div>
+          <div class="metric"><strong>0</strong> features in blocked state</div>
+        </div>
+      </header>
+
+      <section>
+        <h2>Agent status</h2>
+        <p class="muted">Persisted assignments are distinct by role. The implementation and independent validation reports record the actual model lanes and validation runtime evidence.</p>
+        <table>
+          <thead><tr><th>Role</th><th>Assignment</th><th>Model</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>Orchestrator</td><td><code>crm020_operations_orchestrator_sol</code></td><td>Sol · high</td><td>Closed validation state</td></tr>
+            <tr><td>Implementer</td><td><code>crm020_operations_implementer_terra</code></td><td>Terra · high</td><td>Bounded revision complete</td></tr>
+            <tr><td>Validator</td><td><code>crm020_operations_validator_sol</code></td><td>Sol · high</td><td>Changes requested: external evidence</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section>
+        <h2>Completed delivery</h2>
+        <p>CRM-001 through CRM-019 and CRM-023 are marked <strong>done</strong>, each with an implementation report and independent validation report.</p>
+        <ul>
+          <li>Foundation, PostgreSQL/static assets, catalogs, identity, parties, leads, activities, workspace, imports, quality, search, segments, metrics, exports, privacy, jobs, and accessibility are complete.</li>
+          <li>Recent totals: CRM-019 closed at 216 tests; CRM-020 validation reaches 229 full-harness tests and 24 focused revision tests.</li>
+          <li>Existing non-fatal test warnings are WhiteNoise warnings for the absent default <code>staticfiles/</code> directory.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>Current feature: CRM-020</h2>
+        <p><strong>Deployment, observability, backups, and recovery</strong> completed its bounded repository revision and returned from independent validation with external evidence changes requested. Implemented so far:</p>
+        <ul>
+          <li>Digest-pinned multi-stage image, non-root runtime, external configuration, and separate web/worker commands.</li>
+          <li>Correlation-aware JSON events, bounded aggregate metrics, request IDs, and domain/job instrumentation without sensitive payloads.</li>
+          <li>Versioned SLIs, alert thresholds, deployment/rollback/incident/worker runbooks, and operations artifact verification.</li>
+          <li>Exact-name-gated PostgreSQL restore-drill adapter that fails closed unless explicitly enabled.</li>
+          <li>229-test full harness, 24 focused tests, passing operations verifier, and a production-image smoke that renders the page and serves its manifest-hashed asset as non-root.</li>
+        </ul>
+        <p>CRM-020 remains <strong>changes requested</strong>. The prior static-root/rendered-static HTTP, non-root Gunicorn control-path, and failed-job correlation defects are resolved; approval is withheld only for mandatory deployment-owned evidence.</p>
+        <div class="notice">
+          <strong>External blockers:</strong> one-digest staging/production promotion; staging deployment, migration, readiness, and rollback rehearsal; a deployed failed request/job observability walkthrough; a signed managed-backup/PITR isolated restore with encrypted artifacts, backup freshness, login/count/lineage/report checks, and measured approved RPO/RTO; and fire/recovery records for web, database, stale-backup, and job-backlog alerts.
+        </div>
+      </section>
+
+      <section>
+        <h2>Next backlog</h2>
+        <table>
+          <thead><tr><th>Feature</th><th>Status</th><th>Dependency state</th></tr></thead>
+          <tbody>
+            <tr><td><strong>CRM-020</strong> — Deployment, observability, backups, and recovery</td><td>Changes requested</td><td>Repository checks pass; mandatory external evidence remains open</td></tr>
+            <tr><td><strong>CRM-021</strong> — Workbook migration rehearsal, reconciliation, and cutover</td><td>Pending</td><td>CRM-020 is not done and no source workbook is present</td></tr>
+            <tr><td><strong>CRM-022</strong> — System validation, UAT, training, and launch readiness</td><td>Pending</td><td>Depends on CRM-020 and CRM-021</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section>
+        <h2>Evidence</h2>
+        <ul>
+          <li><a href="crm/progress/current.md">Current orchestrator session</a></li>
+          <li><a href="crm/feature_list.json">Feature backlog and lifecycle state</a></li>
+          <li><a href="crm/progress/history.md">Completed-session history</a></li>
+          <li><a href="crm/progress/impl_CRM-020.md">CRM-020 implementation report</a></li>
+          <li><a href="crm/progress/validation_CRM-020.md">CRM-020 independent validation report</a></li>
+          <li><a href="crm/progress/tasks/CRM-020.json">CRM-020 task envelope</a></li>
+          <li><a href="crm/docs/operations.md">CRM-020 operations contract</a></li>
+          <li><a href="crm/docs/verification.md">Verification contract and acceptance procedures</a></li>
+          <li><a href="ops/runbooks.md">Deployment and recovery runbooks</a></li>
+        </ul>
+      </section>
+
+      <footer>Prepared from persisted project state on 2026-08-13. This page is a status snapshot; the feature backlog and reports are authoritative.</footer>
+    </main>
+  </body>
+</html>

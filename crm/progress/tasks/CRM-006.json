@@ -1,0 +1,94 @@
+{
+  "schema_version": 1,
+  "feature_id": "CRM-006",
+  "requirement_ids": [
+    "CRM-006-R01",
+    "CRM-006-R02",
+    "CRM-006-R03",
+    "CRM-006-R04",
+    "CRM-006-R05",
+    "CRM-006-R06"
+  ],
+  "acceptance_ids": [
+    "CRM-006-AC01",
+    "CRM-006-AC02",
+    "CRM-006-AC03",
+    "CRM-006-AC04",
+    "CRM-006-AC05"
+  ],
+  "dependencies": ["CRM-004", "CRM-005"],
+  "allowed_scope": [
+    "README.md",
+    "crm/docs/architecture.md",
+    "crm/docs/conventions.md",
+    "crm/docs/verification.md",
+    "crm/docs/parties.md",
+    "src/simple_crm/crm/models.py",
+    "src/simple_crm/crm/normalization.py",
+    "src/simple_crm/crm/services.py",
+    "src/simple_crm/crm/admin.py",
+    "src/simple_crm/crm/migrations/0004_party_domain.py",
+    "tests/crm/test_party_models.py",
+    "crm/progress/impl_CRM-006.md"
+  ],
+  "out_of_scope": [
+    "PROJECT_STATUS.html",
+    "crm/feature_list.json",
+    "crm/progress/current.md",
+    "crm/progress/history.md",
+    "crm/progress/tasks/CRM-006.json",
+    "crm/progress/validation_CRM-006.md",
+    "crm/AGENTS.md",
+    "crm/agents/",
+    "crm/adapters/",
+    "crm/harness.json",
+    "crm/scripts/",
+    "src/simple_crm/identity/",
+    "src/simple_crm/activity/",
+    "src/simple_crm/data_quality/",
+    "src/simple_crm/reporting/",
+    "src/simple_crm/platform/",
+    "Lead, interaction, task, import, merge, search, report, and clinical identity records",
+    "Automatic fuzzy merging",
+    "Patient or clinical identities",
+    "Production data loading or workbook cutover"
+  ],
+  "baseline_revision": "fcbe3b4ea14e155084019f9248a909826397d188",
+  "baseline_note": "Dirty completed-feature worktree after CRM-001, CRM-023, CRM-002, CRM-003, CRM-004, and CRM-005. Preserve all existing changes, PROJECT_STATUS.html, official vendored assets/licenses, and the staged deletion of src/simple_crm/__pycache__/__init__.cpython-312.pyc. CRM-006 owns only party master-data persistence and deterministic normalization.",
+  "implementation_report": "progress/impl_CRM-006.md",
+  "validation_report": "progress/validation_CRM-006.md",
+  "implementer": "crm006_party_implementer_terra",
+  "validator": "crm006_party_validator_sol",
+  "agent_assignments": {
+    "orchestrator": {
+      "agent_id": "crm006_orchestrator_sol",
+      "model": "gpt-5.6-sol",
+      "reasoning_effort": "high",
+      "source": "role_default"
+    },
+    "implementer": {
+      "agent_id": "crm006_party_implementer_terra",
+      "model": "gpt-5.6-terra",
+      "reasoning_effort": "high",
+      "source": "role_default"
+    },
+    "validator": {
+      "agent_id": "crm006_party_validator_sol",
+      "model": "gpt-5.6-sol",
+      "reasoning_effort": "high",
+      "source": "role_default"
+    }
+  },
+  "architecture_decision": "Party master data remains owned by simple_crm.crm. Party has one database-enforced person or organization subtype; reusable contact points are atomic and linked through a sharing table so institutional values are not personal identifiers. Raw values and provenance are retained, normalization is deterministic, archive is the non-destructive lifecycle boundary, and match preview warns without merging.",
+  "verification_commands": [
+    "timeout 60s ./crm/init.sh",
+    "PYTHONDONTWRITEBYTECODE=1 .venv/bin/ruff check .",
+    "PYTHONDONTWRITEBYTECODE=1 .venv/bin/ruff format --check .",
+    "PYTHONDONTWRITEBYTECODE=1 .venv/bin/mypy src",
+    "PYTHONDONTWRITEBYTECODE=1 .venv/bin/pytest -q",
+    "DJANGO_SETTINGS_MODULE=simple_crm.config.settings.test PYTHONDONTWRITEBYTECODE=1 .venv/bin/python manage.py check",
+    "DJANGO_SETTINGS_MODULE=simple_crm.config.settings.test PYTHONDONTWRITEBYTECODE=1 .venv/bin/python manage.py makemigrations --check --dry-run",
+    "PYTHONDONTWRITEBYTECODE=1 .venv/bin/pytest -q tests/crm/test_party_models.py",
+    "git diff --check"
+  ]
+}

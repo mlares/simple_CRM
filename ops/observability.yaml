@@ -1,0 +1,60 @@
+service: simple-crm
+environment_labels:
+  required: [environment, release, region]
+correlation:
+  request_header: X-Request-ID
+  response_header: X-Request-ID
+  max_length: 64
+  payload_logging: prohibited
+slis:
+  availability:
+    probe: /health/ready/
+    target: 99.5%
+    window: 30d
+  latency:
+    scope: authenticated-list-and-search
+    percentile: p95
+    target_ms: 500
+  dashboard_latency:
+    scope: standard-dashboard
+    percentile: p95
+    target_ms: 2000
+  error_rate:
+    source: structured-event.status
+    threshold: 1%
+    window: 10m
+  database_saturation:
+    source: connection-pool-and-query-timing
+    threshold: 80%
+    window: 10m
+  job_backlog:
+    source: outbox.pending_and_failed
+    threshold: 100
+    window: 15m
+  import_failures:
+    source: imports.preview-and-apply
+    threshold: 5%
+    window: 15m
+  backup_freshness:
+    source: managed-postgresql-backup-age
+    threshold: 15m
+    window: 5m
+alerts:
+  - name: crm-web-unavailable
+    when: availability < 99.5% for 5m
+    severity: page
+  - name: crm-web-errors
+    when: error_rate > 1% for 10m
+    severity: page
+  - name: crm-database-saturated
+    when: database_saturation > 80% for 10m
+    severity: ticket
+  - name: crm-job-backlog
+    when: job_backlog > 100 for 15m
+    severity: ticket
+  - name: crm-import-failures
+    when: import_failures > 5% for 15m
+    severity: ticket
+  - name: crm-backup-stale
+    when: backup_freshness > 15m for 5m
+    severity: page

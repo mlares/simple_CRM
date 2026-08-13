@@ -13,7 +13,7 @@ These are objective checks for a healthy generated project.
 
 - [ ] There is at most one `in_progress` feature.
 - [ ] Feature ids are unique.
-- [ ] A feature is not marked `done` without acceptance criteria and a review
+- [ ] A feature is not marked `done` without acceptance criteria and a validation
       report.
 
 ## C3 — Scope and quality
@@ -26,7 +26,7 @@ These are objective checks for a healthy generated project.
 
 - [ ] Every completed feature has executable verification or an explicitly
       documented non-executable verification strategy.
-- [ ] The latest implementation and review reports are present in
+- [ ] The latest implementation and validation reports are present in
       `progress/`.
 
 ## C5 — Handoff

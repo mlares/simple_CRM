@@ -1,0 +1,104 @@
+{
+  "schema_version": 1,
+  "feature_id": "CRM-020",
+  "requirement_ids": [
+    "CRM-020-R01",
+    "CRM-020-R02",
+    "CRM-020-R03",
+    "CRM-020-R04",
+    "CRM-020-R05",
+    "CRM-020-R06"
+  ],
+  "acceptance_ids": [
+    "CRM-020-AC01",
+    "CRM-020-AC02",
+    "CRM-020-AC03",
+    "CRM-020-AC04",
+    "CRM-020-AC05"
+  ],
+  "dependencies": ["CRM-002", "CRM-003", "CRM-017", "CRM-019"],
+  "allowed_scope": [
+    "README.md",
+    "Dockerfile",
+    ".dockerignore",
+    "docker/entrypoint.sh",
+    "crm/docs/architecture.md",
+    "crm/docs/conventions.md",
+    "crm/docs/verification.md",
+    "crm/docs/operations.md",
+    "ops/observability.yaml",
+    "ops/runbooks.md",
+    "src/simple_crm/config/observability.py",
+    "src/simple_crm/config/settings/base.py",
+    "src/simple_crm/config/settings/_deployment.py",
+    "src/simple_crm/platform/views.py",
+    "src/simple_crm/platform/urls.py",
+    "src/simple_crm/platform/jobs.py",
+    "src/simple_crm/platform/management/",
+    "src/simple_crm/data_quality/services.py",
+    "src/simple_crm/reporting/exports.py",
+    "src/simple_crm/identity/views.py",
+    "src/simple_crm/crm/lead_services.py",
+    "scripts/verify-operations.sh",
+    "scripts/verify-production-image.sh",
+    "scripts/restore-drill.sh",
+    "tests/config/test_observability.py",
+    "tests/platform/test_observability_requests.py",
+    "tests/platform/test_pages_and_health.py",
+    "tests/platform/test_jobs.py",
+    "tests/integration/test_verify_operations_script.py",
+    "tests/integration/test_verify_production_image_script.py",
+    "tests/integration/test_restore_drill_script.py",
+    "crm/progress/impl_CRM-020.md"
+  ],
+  "out_of_scope": [
+    "PROJECT_STATUS.html",
+    "crm/feature_list.json",
+    "crm/progress/current.md",
+    "crm/progress/history.md",
+    "crm/progress/tasks/CRM-020.json",
+    "crm/progress/validation_CRM-020.md",
+    "crm/AGENTS.md",
+    "crm/agents/",
+    "crm/adapters/",
+    "crm/harness.json",
+    "Selecting a cloud provider",
+    "Microservice orchestration",
+    "Production credentials or customer data"
+  ],
+  "baseline_revision": "fcbe3b4ea14e155084019f9248a909826397d188",
+  "baseline_note": "CRM-019 is complete with approved HTTP, dependency, and PostgreSQL role/RLS evidence. Preserve the existing completed-feature worktree and PROJECT_STATUS.html. CRM-020 independent validation runtime 019ffb20-f2e8-7972-9e34-dfecee30112a requested a bounded revision: align effective production STATIC_ROOT with the image manifest and prove rendered/static HTTP behavior, give non-root Gunicorn a writable control path, and establish a bounded opaque per-job correlation context with failed-job trace/redaction coverage. Genuine staging promotion/rehearsal, signed managed-backup restore, observability walkthrough, and alert fire/recovery records remain external acceptance evidence and must not be invented.",
+  "implementation_report": "progress/impl_CRM-020.md",
+  "validation_report": "progress/validation_CRM-020.md",
+  "implementer": "crm020_operations_implementer_terra",
+  "validator": "crm020_operations_validator_sol",
+  "agent_assignments": {
+    "orchestrator": {
+      "agent_id": "crm020_operations_orchestrator_sol",
+      "model": "gpt-5.6-sol",
+      "reasoning_effort": "high",
+      "source": "role_default"
+    },
+    "implementer": {
+      "agent_id": "crm020_operations_implementer_terra",
+      "model": "gpt-5.6-terra",
+      "reasoning_effort": "high",
+      "source": "role_default"
+    },
+    "validator": {
+      "agent_id": "crm020_operations_validator_sol",
+      "model": "gpt-5.6-sol",
+      "reasoning_effort": "high",
+      "source": "role_default"
+    }
+  },
+  "architecture_decision": "Use one immutable multi-stage image with web and worker commands, external environment configuration, JSON correlation-aware observability with bounded in-process metrics, provider-neutral SLI/alert/runbook contracts, and opt-in PostgreSQL/object-storage restore drills. Keep provider provisioning outside the repository while making promotion and recovery procedures executable and non-disclosing.",
+  "verification_commands": [
+    "timeout 120s ./crm/init.sh",
+    "PYTHONDONTWRITEBYTECODE=1 .venv/bin/pytest -q tests/config/test_observability.py tests/platform/test_observability_requests.py tests/platform/test_pages_and_health.py tests/integration/test_verify_operations_script.py tests/integration/test_restore_drill_script.py",
+    "bash scripts/verify-operations.sh",
+    "bash scripts/verify-production-image.sh",
+    "bash scripts/restore-drill.sh",
+    "git diff --check"
+  ]
+}

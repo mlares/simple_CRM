@@ -108,7 +108,22 @@
       "title": "Spec-driven agent delivery harness",
       "phase": "Foundation",
       "priority": "P0",
-      "status": "pending",
+      "status": "done",
+      "status_history": [
+        "pending",
+        "in_progress",
+        "review",
+        "changes_requested",
+        "in_progress",
+        "review",
+        "changes_requested",
+        "in_progress",
+        "review",
+        "done"
+      ],
+      "task_envelope": "progress/tasks/CRM-001.json",
+      "implementation_report": "progress/impl_CRM-001.md",
+      "validation_report": "progress/validation_CRM-001.md",
       "depends_on": [],
       "user_story": "As the workflow owner, I need orchestrator, implementer, and validator agents to execute one approved feature at a time with durable evidence.",
       "requirements": [
@@ -169,9 +184,24 @@
       "title": "Django project and developer foundation",
       "phase": "Foundation",
       "priority": "P0",
-      "status": "pending",
+      "status": "done",
+      "status_history": [
+        "pending",
+        "in_progress",
+        "blocked",
+        "in_progress",
+        "review",
+        "changes_requested",
+        "in_progress",
+        "review",
+        "done"
+      ],
+      "task_envelope": "progress/tasks/CRM-002.json",
+      "implementation_report": "progress/impl_CRM-002.md",
+      "validation_report": "progress/validation_CRM-002.md",
       "depends_on": [
-        "CRM-001"
+        "CRM-001",
+        "CRM-023"
       ],
       "user_story": "As a developer, I need a reproducible Django application skeleton so every later feature shares the same tested foundation.",
       "requirements": [
@@ -228,7 +258,26 @@
       "title": "PostgreSQL persistence and environment configuration",
       "phase": "Foundation",
       "priority": "P0",
-      "status": "pending",
+      "status": "done",
+      "status_history": [
+        "pending",
+        "in_progress",
+        "review",
+        "changes_requested",
+        "in_progress",
+        "review",
+        "changes_requested",
+        "blocked",
+        "in_progress",
+        "review",
+        "changes_requested",
+        "in_progress",
+        "review",
+        "done"
+      ],
+      "task_envelope": "progress/tasks/CRM-003.json",
+      "implementation_report": "progress/impl_CRM-003.md",
+      "validation_report": "progress/validation_CRM-003.md",
       "depends_on": [
         "CRM-002"
       ],
@@ -287,7 +336,19 @@
       "title": "Reference catalogs and controlled taxonomies",
       "phase": "Data foundation",
       "priority": "P0",
-      "status": "pending",
+      "status": "done",
+      "status_history": [
+        "pending",
+        "in_progress",
+        "review",
+        "changes_requested",
+        "in_progress",
+        "review",
+        "done"
+      ],
+      "task_envelope": "progress/tasks/CRM-004.json",
+      "implementation_report": "progress/impl_CRM-004.md",
+      "validation_report": "progress/validation_CRM-004.md",
       "depends_on": [
         "CRM-003"
       ],
@@ -346,7 +407,16 @@
       "title": "Identity, roles, teams, and scoped authorization",
       "phase": "Data foundation",
       "priority": "P0",
-      "status": "pending",
+      "status": "done",
+      "status_history": [
+        "pending",
+        "in_progress",
+        "review",
+        "done"
+      ],
+      "task_envelope": "progress/tasks/CRM-005.json",
+      "implementation_report": "progress/impl_CRM-005.md",
+      "validation_report": "progress/validation_CRM-005.md",
       "depends_on": [
         "CRM-003"
       ],
@@ -414,7 +484,16 @@
       "title": "Parties, organizations, people, and contact points",
       "phase": "Core CRM",
       "priority": "P0",
-      "status": "pending",
+      "status": "done",
+      "status_history": [
+        "pending",
+        "in_progress",
+        "review",
+        "done"
+      ],
+      "task_envelope": "progress/tasks/CRM-006.json",
+      "implementation_report": "progress/impl_CRM-006.md",
+      "validation_report": "progress/validation_CRM-006.md",
       "depends_on": [
         "CRM-004",
         "CRM-005"
@@ -483,7 +562,16 @@
       "title": "Lead lifecycle, ownership, and stage history",
       "phase": "Core CRM",
       "priority": "P0",
-      "status": "pending",
+      "status": "done",
+      "status_history": [
+        "pending",
+        "in_progress",
+        "review",
+        "done"
+      ],
+      "task_envelope": "progress/tasks/CRM-007.json",
+      "implementation_report": "progress/impl_CRM-007.md",
+      "validation_report": "progress/validation_CRM-007.md",
       "depends_on": [
         "CRM-004",
         "CRM-005",
@@ -553,7 +641,16 @@
       "title": "Interactions, tasks, and lead timeline",
       "phase": "Core CRM",
       "priority": "P0",
-      "status": "pending",
+      "status": "done",
+      "status_history": [
+        "pending",
+        "in_progress",
+        "review",
+        "done"
+      ],
+      "task_envelope": "progress/tasks/CRM-008.json",
+      "implementation_report": "progress/impl_CRM-008.md",
+      "validation_report": "progress/validation_CRM-008.md",
       "depends_on": [
         "CRM-006",
         "CRM-007"
@@ -622,7 +719,16 @@
       "title": "Today workspace and guided CRM navigation",
       "phase": "Core CRM",
       "priority": "P0",
-      "status": "pending",
+      "status": "done",
+      "status_history": [
+        "pending",
+        "in_progress",
+        "review",
+        "done"
+      ],
+      "task_envelope": "progress/tasks/CRM-009.json",
+      "implementation_report": "progress/impl_CRM-009.md",
+      "validation_report": "progress/validation_CRM-009.md",
       "depends_on": [
         "CRM-007",
         "CRM-008"
@@ -682,7 +788,16 @@
       "title": "Lossless spreadsheet import, staging, and lineage",
       "phase": "Data quality",
       "priority": "P0",
-      "status": "pending",
+      "status": "done",
+      "status_history": [
+        "pending",
+        "in_progress",
+        "review",
+        "done"
+      ],
+      "task_envelope": "progress/tasks/CRM-010.json",
+      "implementation_report": "progress/impl_CRM-010.md",
+      "validation_report": "progress/validation_CRM-010.md",
       "depends_on": [
         "CRM-006",
         "CRM-007"
@@ -751,7 +866,16 @@
       "title": "Data-quality queue, matching, and governed merge",
       "phase": "Data quality",
       "priority": "P0",
-      "status": "pending",
+      "status": "done",
+      "status_history": [
+        "pending",
+        "in_progress",
+        "review",
+        "done"
+      ],
+      "task_envelope": "progress/tasks/CRM-011.json",
+      "implementation_report": "progress/impl_CRM-011.md",
+      "validation_report": "progress/validation_CRM-011.md",
       "depends_on": [
         "CRM-006",
         "CRM-007",
@@ -821,7 +945,16 @@
       "title": "Permission-scoped global search",
       "phase": "Query and reporting",
       "priority": "P0",
-      "status": "pending",
+      "status": "done",
+      "status_history": [
+        "pending",
+        "in_progress",
+        "review",
+        "done"
+      ],
+      "task_envelope": "progress/tasks/CRM-012.json",
+      "implementation_report": "progress/impl_CRM-012.md",
+      "validation_report": "progress/validation_CRM-012.md",
       "depends_on": [
         "CRM-006",
         "CRM-007",
@@ -887,7 +1020,16 @@
       "title": "Guided filters, segments, and saved views",
       "phase": "Query and reporting",
       "priority": "P0",
-      "status": "pending",
+      "status": "done",
+      "status_history": [
+        "pending",
+        "in_progress",
+        "review",
+        "done"
+      ],
+      "task_envelope": "progress/tasks/CRM-013.json",
+      "implementation_report": "progress/impl_CRM-013.md",
+      "validation_report": "progress/validation_CRM-013.md",
       "depends_on": [
         "CRM-009",
         "CRM-012"
@@ -952,7 +1094,16 @@
       "title": "Metric catalog, dashboards, and governed reports",
       "phase": "Query and reporting",
       "priority": "P0",
-      "status": "pending",
+      "status": "done",
+      "status_history": [
+        "pending",
+        "in_progress",
+        "review",
+        "done"
+      ],
+      "task_envelope": "progress/tasks/CRM-014.json",
+      "implementation_report": "progress/impl_CRM-014.md",
+      "validation_report": "progress/validation_CRM-014.md",
       "depends_on": [
         "CRM-007",
         "CRM-008",
@@ -1022,7 +1173,16 @@
       "title": "Governed exports",
       "phase": "Query and reporting",
       "priority": "P1",
-      "status": "pending",
+      "status": "done",
+      "status_history": [
+        "pending",
+        "in_progress",
+        "review",
+        "done"
+      ],
+      "task_envelope": "progress/tasks/CRM-015.json",
+      "implementation_report": "progress/impl_CRM-015.md",
+      "validation_report": "progress/validation_CRM-015.md",
       "depends_on": [
         "CRM-005",
         "CRM-013",
@@ -1088,7 +1248,16 @@
       "title": "Audit, privacy, retention, and governed correction",
       "phase": "Trust and governance",
       "priority": "P0",
-      "status": "pending",
+      "status": "done",
+      "status_history": [
+        "pending",
+        "in_progress",
+        "review",
+        "done"
+      ],
+      "task_envelope": "progress/tasks/CRM-016.json",
+      "implementation_report": "progress/impl_CRM-016.md",
+      "validation_report": "progress/validation_CRM-016.md",
       "depends_on": [
         "CRM-005",
         "CRM-006",
@@ -1161,7 +1330,16 @@
       "title": "Transactional jobs, reminders, and notifications",
       "phase": "Platform",
       "priority": "P1",
-      "status": "pending",
+      "status": "done",
+      "status_history": [
+        "pending",
+        "in_progress",
+        "review",
+        "done"
+      ],
+      "task_envelope": "progress/tasks/CRM-017.json",
+      "implementation_report": "progress/impl_CRM-017.md",
+      "validation_report": "progress/validation_CRM-017.md",
       "depends_on": [
         "CRM-003",
         "CRM-008"
@@ -1226,7 +1404,16 @@
       "title": "Spanish-first accessible and responsive experience",
       "phase": "User experience",
       "priority": "P0",
-      "status": "pending",
+      "status": "done",
+      "status_history": [
+        "pending",
+        "in_progress",
+        "review",
+        "done"
+      ],
+      "task_envelope": "progress/tasks/CRM-018.json",
+      "implementation_report": "progress/impl_CRM-018.md",
+      "validation_report": "progress/validation_CRM-018.md",
       "depends_on": [
         "CRM-009",
         "CRM-011",
@@ -1298,7 +1485,19 @@
       "title": "Application security and defense in depth",
       "phase": "Trust and governance",
       "priority": "P0",
-      "status": "pending",
+      "status": "done",
+      "status_history": [
+        "pending",
+        "in_progress",
+        "review",
+        "changes_requested",
+        "in_progress",
+        "review",
+        "done"
+      ],
+      "task_envelope": "progress/tasks/CRM-019.json",
+      "implementation_report": "progress/impl_CRM-019.md",
+      "validation_report": "progress/validation_CRM-019.md",
       "depends_on": [
         "CRM-003",
         "CRM-005",
@@ -1370,7 +1569,22 @@
       "title": "Deployment, observability, backups, and recovery",
       "phase": "Operations",
       "priority": "P0",
-      "status": "pending",
+      "status": "changes_requested",
+      "status_history": [
+        "pending",
+        "in_progress",
+        "review",
+        "changes_requested",
+        "in_progress",
+        "review",
+        "changes_requested",
+        "in_progress",
+        "review",
+        "changes_requested"
+      ],
+      "task_envelope": "progress/tasks/CRM-020.json",
+      "implementation_report": "progress/impl_CRM-020.md",
+      "validation_report": "progress/validation_CRM-020.md",
       "depends_on": [
         "CRM-002",
         "CRM-003",
@@ -1595,6 +1809,80 @@
       "out_of_scope": [
         "Post-launch phase-three AI querying",
         "Features not represented by approved backlog changes"
+      ]
+    },
+    {
+      "id": "CRM-023",
+      "title": "Persistent role-specific agent model policy",
+      "phase": "Foundation",
+      "priority": "P0",
+      "status": "done",
+      "status_history": [
+        "pending",
+        "in_progress",
+        "review",
+        "done"
+      ],
+      "task_envelope": "progress/tasks/CRM-023.json",
+      "implementation_report": "progress/impl_CRM-023.md",
+      "validation_report": "progress/validation_CRM-023.md",
+      "depends_on": [
+        "CRM-001"
+      ],
+      "user_story": "As the workflow owner, I need every delegated role to use a persisted and verifiable model and reasoning policy rather than inheriting an opaque session default.",
+      "requirements": [
+        {
+          "id": "CRM-023-R01",
+          "statement": "Persist the supported model catalog and default model/reasoning assignment for orchestrator, implementer, validator, and explorer roles in harness metadata."
+        },
+        {
+          "id": "CRM-023-R02",
+          "statement": "Require every active feature task envelope to record resolved role assignments with agent ID, model, reasoning effort, and whether the value came from the role default or a justified override."
+        },
+        {
+          "id": "CRM-023-R03",
+          "statement": "Validate role completeness, supported model/effort combinations, task-policy consistency, implementer/validator independence, and non-empty reasons for overrides."
+        },
+        {
+          "id": "CRM-023-R04",
+          "statement": "Update canonical role and adapter instructions so runtime delegation uses the persisted assignment and reports the actual model and reasoning effort used."
+        },
+        {
+          "id": "CRM-023-R05",
+          "statement": "Keep full project verification deterministic in this environment by syncing the locked UV environment and invoking its tools without the known hanging uv-run wrapper."
+        }
+      ],
+      "acceptance": [
+        {
+          "id": "CRM-023-AC01",
+          "criterion": "The persisted defaults are Sol/high for orchestrator, Terra/high for implementer, Sol/high for validator, and Luna/medium for explorer.",
+          "evidence": "Harness metadata and policy tests"
+        },
+        {
+          "id": "CRM-023-AC02",
+          "criterion": "The harness rejects missing roles, unsupported models or efforts, assignment/default mismatches, same-agent implementation and validation, and overrides without a reason.",
+          "evidence": "Isolated positive and negative harness fixtures"
+        },
+        {
+          "id": "CRM-023-AC03",
+          "criterion": "The active task records exact runtime assignments and delegated agents are launched with those model and reasoning overrides.",
+          "evidence": "Task envelope, orchestration record, and implementation/validation reports"
+        },
+        {
+          "id": "CRM-023-AC04",
+          "criterion": "Canonical role and adapter instructions require persisted assignments, justified deviations, and actual-runtime reporting.",
+          "evidence": "Contract inspection and focused tests"
+        },
+        {
+          "id": "CRM-023-AC05",
+          "criterion": "Running crm/init.sh terminates successfully and executes the complete project verification suite.",
+          "evidence": "Captured final init output"
+        }
+      ],
+      "out_of_scope": [
+        "Changing CRM business functionality",
+        "Calling the OpenAI API from the CRM application",
+        "Hard-coding credentials or account-specific identifiers"
       ]
     }
   ]
