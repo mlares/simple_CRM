@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "feature_id": "CRM-023",
+  "requirement_ids": [
+    "CRM-023-R01",
+    "CRM-023-R02",
+    "CRM-023-R03",
+    "CRM-023-R04",
+    "CRM-023-R05"
+  ],
+  "acceptance_ids": [
+    "CRM-023-AC01",
+    "CRM-023-AC02",
+    "CRM-023-AC03",
+    "CRM-023-AC04",
+    "CRM-023-AC05"
+  ],
+  "dependencies": [
+    "CRM-001"
+  ],
+  "allowed_scope": [
+    "crm/harness.json",
+    "crm/AGENTS.md",
+    "crm/agents/",
+    "crm/adapters/",
+    "crm/CLAUDE.md",
+    "crm/scripts/harness_check.py",
+    "crm/tests/",
+    "crm/progress/templates/task_envelope.json",
+    "scripts/verify-fast.sh",
+    "crm/progress/impl_CRM-023.md"
+  ],
+  "out_of_scope": [
+    "crm/feature_list.json",
+    "crm/progress/current.md",
+    "crm/progress/history.md",
+    "crm/progress/tasks/",
+    "crm/progress/validation_CRM-023.md",
+    "src/",
+    "tests/",
+    "pyproject.toml",
+    "uv.lock",
+    "CRM business functionality"
+  ],
+  "baseline_revision": "fcbe3b4ea14e155084019f9248a909826397d188",
+  "baseline_note": "Dirty worktree with CRM-001 complete and CRM-002 application code paused after 91 direct tests passed. Preserve all existing work and the staged bytecode deletion.",
+  "implementation_report": "progress/impl_CRM-023.md",
+  "validation_report": "progress/validation_CRM-023.md",
+  "implementer": "crm023_policy_implementer",
+  "validator": "crm023_policy_validator",
+  "agent_assignments": {
+    "orchestrator": {
+      "agent_id": "crm023_policy_orchestrator",
+      "model": "gpt-5.6-sol",
+      "reasoning_effort": "high",
+      "source": "role_default"
+    },
+    "implementer": {
+      "agent_id": "crm023_policy_implementer",
+      "model": "gpt-5.6-terra",
+      "reasoning_effort": "high",
+      "source": "role_default"
+    },
+    "validator": {
+      "agent_id": "crm023_policy_validator",
+      "model": "gpt-5.6-sol",
+      "reasoning_effort": "high",
+      "source": "role_default"
+    }
+  },
+  "verification_commands": [
+    "python3 crm/scripts/harness_check.py",
+    "PYTHONDONTWRITEBYTECODE=1 .venv/bin/pytest -q",
+    "PYTHONDONTWRITEBYTECODE=1 .venv/bin/ruff check .",
+    "PYTHONDONTWRITEBYTECODE=1 .venv/bin/ruff format --check .",
+    "timeout 60s ./crm/init.sh",
+    "git diff --check"
+  ]
+}

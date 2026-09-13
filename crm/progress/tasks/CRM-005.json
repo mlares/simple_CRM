@@ -1,0 +1,94 @@
+{
+  "schema_version": 1,
+  "feature_id": "CRM-005",
+  "requirement_ids": [
+    "CRM-005-R01",
+    "CRM-005-R02",
+    "CRM-005-R03",
+    "CRM-005-R04",
+    "CRM-005-R05",
+    "CRM-005-R06"
+  ],
+  "acceptance_ids": [
+    "CRM-005-AC01",
+    "CRM-005-AC02",
+    "CRM-005-AC03",
+    "CRM-005-AC04",
+    "CRM-005-AC05"
+  ],
+  "dependencies": ["CRM-003"],
+  "allowed_scope": [
+    "README.md",
+    "crm/docs/architecture.md",
+    "crm/docs/conventions.md",
+    "crm/docs/verification.md",
+    "crm/docs/identity.md",
+    "src/simple_crm/config/settings/base.py",
+    "src/simple_crm/config/urls.py",
+    "src/simple_crm/identity/",
+    "tests/config/test_identity_configuration.py",
+    "tests/identity/",
+    "crm/progress/impl_CRM-005.md"
+  ],
+  "out_of_scope": [
+    "PROJECT_STATUS.html",
+    "crm/feature_list.json",
+    "crm/progress/current.md",
+    "crm/progress/history.md",
+    "crm/progress/tasks/CRM-005.json",
+    "crm/progress/validation_CRM-005.md",
+    "crm/AGENTS.md",
+    "crm/agents/",
+    "crm/adapters/",
+    "crm/harness.json",
+    "crm/scripts/",
+    "src/simple_crm/crm/",
+    "src/simple_crm/activity/",
+    "src/simple_crm/data_quality/",
+    "src/simple_crm/reporting/",
+    "src/simple_crm/platform/",
+    "Sales-domain records, lead ownership, contacts, interactions, tasks, and reports",
+    "Building or operating an enterprise identity provider",
+    "Shared user accounts",
+    "Production OIDC provider provisioning"
+  ],
+  "baseline_revision": "fcbe3b4ea14e155084019f9248a909826397d188",
+  "baseline_note": "Dirty completed-feature worktree after CRM-001, CRM-023, CRM-002, CRM-003, and CRM-004. Preserve every existing change, PROJECT_STATUS.html, official vendored assets/licenses, and the staged deletion of src/simple_crm/__pycache__/__init__.cpython-312.pyc. CRM-005 may add identity and authorization infrastructure only.",
+  "implementation_report": "progress/impl_CRM-005.md",
+  "validation_report": "progress/validation_CRM-005.md",
+  "implementer": "crm005_identity_implementer_terra",
+  "validator": "crm005_identity_validator_sol",
+  "agent_assignments": {
+    "orchestrator": {
+      "agent_id": "crm005_orchestrator_sol",
+      "model": "gpt-5.6-sol",
+      "reasoning_effort": "high",
+      "source": "role_default"
+    },
+    "implementer": {
+      "agent_id": "crm005_identity_implementer_terra",
+      "model": "gpt-5.6-terra",
+      "reasoning_effort": "high",
+      "source": "role_default"
+    },
+    "validator": {
+      "agent_id": "crm005_identity_validator_sol",
+      "model": "gpt-5.6-sol",
+      "reasoning_effort": "high",
+      "source": "role_default"
+    }
+  },
+  "architecture_decision": "The existing Django auth user remains the account boundary. The identity app owns enabled profiles, six seeded business roles, action permissions, teams, explicit object/team/campaign grants, temporary elevations, and the centralized policy service. OIDC authorization-code with PKCE is the preferred authentication path; local Argon2 login is an explicitly disabled-by-default fallback. All business visibility callers use the policy service rather than duplicating scope logic.",
+  "offboarding_policy": "Disabling an identity immediately sets the profile disabled_at marker and user.is_active false. The authentication backend rejects new authentication and middleware logs out any existing session on its next request. OIDC callbacks for the disabled subject are rejected.",
+  "verification_commands": [
+    "timeout 60s ./crm/init.sh",
+    "PYTHONDONTWRITEBYTECODE=1 .venv/bin/ruff check .",
+    "PYTHONDONTWRITEBYTECODE=1 .venv/bin/ruff format --check .",
+    "PYTHONDONTWRITEBYTECODE=1 .venv/bin/mypy src",
+    "PYTHONDONTWRITEBYTECODE=1 .venv/bin/pytest -q",
+    "DJANGO_SETTINGS_MODULE=simple_crm.config.settings.test PYTHONDONTWRITEBYTECODE=1 .venv/bin/python manage.py check",
+    "DJANGO_SETTINGS_MODULE=simple_crm.config.settings.test PYTHONDONTWRITEBYTECODE=1 .venv/bin/python manage.py makemigrations --check --dry-run",
+    "PYTHONDONTWRITEBYTECODE=1 .venv/bin/pytest -q tests/identity tests/config/test_identity_configuration.py",
+    "git diff --check"
+  ]
+}

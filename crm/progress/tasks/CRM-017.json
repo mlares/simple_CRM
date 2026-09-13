@@ -1,0 +1,89 @@
+{
+  "schema_version": 1,
+  "feature_id": "CRM-017",
+  "requirement_ids": [
+    "CRM-017-R01",
+    "CRM-017-R02",
+    "CRM-017-R03",
+    "CRM-017-R04",
+    "CRM-017-R05"
+  ],
+  "acceptance_ids": [
+    "CRM-017-AC01",
+    "CRM-017-AC02",
+    "CRM-017-AC03",
+    "CRM-017-AC04",
+    "CRM-017-AC05"
+  ],
+  "dependencies": ["CRM-003", "CRM-008"],
+  "allowed_scope": [
+    "README.md",
+    "crm/docs/architecture.md",
+    "crm/docs/conventions.md",
+    "crm/docs/verification.md",
+    "crm/docs/jobs.md",
+    "src/simple_crm/platform/models.py",
+    "src/simple_crm/platform/jobs.py",
+    "src/simple_crm/platform/views.py",
+    "src/simple_crm/platform/urls.py",
+    "src/simple_crm/platform/migrations/0002_outbox.py",
+    "src/simple_crm/platform/templates/platform/notifications.html",
+    "src/simple_crm/activity/services.py",
+    "tests/platform/test_jobs.py",
+    "tests/platform/test_notifications_page.py",
+    "crm/progress/impl_CRM-017.md"
+  ],
+  "out_of_scope": [
+    "PROJECT_STATUS.html",
+    "crm/feature_list.json",
+    "crm/progress/current.md",
+    "crm/progress/history.md",
+    "crm/progress/tasks/CRM-017.json",
+    "crm/progress/validation_CRM-017.md",
+    "crm/AGENTS.md",
+    "crm/agents/",
+    "crm/adapters/",
+    "crm/harness.json",
+    "crm/scripts/",
+    "Redis, RabbitMQ, and Celery",
+    "Mass-marketing notifications",
+    "Sending real external email or SMS"
+  ],
+  "baseline_revision": "fcbe3b4ea14e155084019f9248a909826397d188",
+  "baseline_note": "Dirty completed-feature worktree after CRM-001 through CRM-016. Preserve existing changes and PROJECT_STATUS.html. CRM-017 owns the PostgreSQL transactional outbox contract, bounded worker services, task reminder lifecycle, preference settings, operator redaction, and focused verification.",
+  "implementation_report": "progress/impl_CRM-017.md",
+  "validation_report": "progress/validation_CRM-017.md",
+  "implementer": "crm017_jobs_implementer_terra",
+  "validator": "crm017_jobs_validator_sol",
+  "agent_assignments": {
+    "orchestrator": {
+      "agent_id": "crm017_jobs_orchestrator_sol",
+      "model": "gpt-5.6-sol",
+      "reasoning_effort": "high",
+      "source": "role_default"
+    },
+    "implementer": {
+      "agent_id": "crm017_jobs_implementer_terra",
+      "model": "gpt-5.6-terra",
+      "reasoning_effort": "high",
+      "source": "role_default"
+    },
+    "validator": {
+      "agent_id": "crm017_jobs_validator_sol",
+      "model": "gpt-5.6-sol",
+      "reasoning_effort": "high",
+      "source": "role_default"
+    }
+  },
+  "architecture_decision": "Use a database-backed transactional outbox as the durable boundary. Reminder payloads contain only stable references, idempotency and leases are enforced in the database, retry errors are safe summaries, preferences default to digest, and no external provider is contacted by the MVP worker adapter.",
+  "verification_commands": [
+    "timeout 60s ./crm/init.sh",
+    "PYTHONDONTWRITEBYTECODE=1 .venv/bin/ruff check .",
+    "PYTHONDONTWRITEBYTECODE=1 .venv/bin/ruff format --check .",
+    "PYTHONDONTWRITEBYTECODE=1 .venv/bin/mypy src",
+    "PYTHONDONTWRITEBYTECODE=1 .venv/bin/pytest -q",
+    "DJANGO_SETTINGS_MODULE=simple_crm.config.settings.test PYTHONDONTWRITEBYTECODE=1 .venv/bin/python manage.py makemigrations --check --dry-run",
+    "PYTHONDONTWRITEBYTECODE=1 .venv/bin/pytest -q tests/platform/test_jobs.py tests/platform/test_notifications_page.py",
+    "git diff --check"
+  ]
+}

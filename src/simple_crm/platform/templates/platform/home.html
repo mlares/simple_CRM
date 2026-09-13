@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+  <head>
+    {% load static %}
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description"
+          content="Espacio comercial para organizar leads, contactos y tareas de seguimiento.">
+    <title>CRM de Ventas</title>
+    <link rel="stylesheet"
+          href="{% static 'vendor/bootstrap/5.3.8/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'platform/accessibility.css' %}">
+  </head>
+  <body class="bg-body-tertiary">
+    <a class="skip-link" href="#contenido">Saltar al contenido principal</a>
+    <header class="border-bottom bg-white">
+      <div class="container py-4">
+        <div class="d-flex justify-content-between align-items-center">
+          <h1 class="h2 mb-0">CRM de Ventas</h1>
+          {% if has_workspace %}
+            <a class="btn btn-primary" href="{% url 'platform:today' %}">Ver mi día</a>
+          {% endif %}
+        </div>
+        <nav class="d-flex flex-wrap gap-3 mt-3" aria-label="Navegación principal">
+          {% for item in nav_items %}
+            {% if item.available %}<a href="{{ item.url }}">{{ item.label }}</a>{% else %}<span class="text-secondary" aria-disabled="true">{{ item.label }}</span>{% endif %}
+          {% endfor %}
+        </nav>
+      </div>
+    </header>
+    <main id="contenido" class="container py-5">
+      <section class="col-lg-8" aria-labelledby="bienvenida">
+        <h2 id="bienvenida" class="h3">Bienvenido al espacio del equipo comercial</h2>
+        <p class="lead">
+          Esta aplicación permitirá organizar clientes, oportunidades y tareas de
+          seguimiento en un solo lugar.
+        </p>
+      </section>
+    </main>
+    <footer class="border-top bg-white">
+      <div class="container py-3">
+        <small>Base de trabajo del equipo de ventas</small>
+      </div>
+    </footer>
+    <script src="{% static 'vendor/htmx/2.0.10/htmx.min.js' %}" defer></script>
+  </body>
+</html>

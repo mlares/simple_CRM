@@ -1,0 +1,92 @@
+{
+  "schema_version": 1,
+  "feature_id": "CRM-019",
+  "requirement_ids": [
+    "CRM-019-R01",
+    "CRM-019-R02",
+    "CRM-019-R03",
+    "CRM-019-R04",
+    "CRM-019-R05",
+    "CRM-019-R06"
+  ],
+  "acceptance_ids": [
+    "CRM-019-AC01",
+    "CRM-019-AC02",
+    "CRM-019-AC03",
+    "CRM-019-AC04",
+    "CRM-019-AC05"
+  ],
+  "dependencies": ["CRM-003", "CRM-005", "CRM-015", "CRM-016", "CRM-017"],
+  "allowed_scope": [
+    "README.md",
+    "crm/docs/architecture.md",
+    "crm/docs/conventions.md",
+    "crm/docs/verification.md",
+    "crm/docs/security.md",
+    "src/simple_crm/config/security.py",
+    "src/simple_crm/config/settings/base.py",
+    "src/simple_crm/config/settings/_deployment.py",
+    "src/simple_crm/identity/views.py",
+    "src/simple_crm/data_quality/services.py",
+    "scripts/verify-security.sh",
+    "scripts/verify-postgres-security.sh",
+    "tests/config/test_security_headers.py",
+    "tests/identity/test_authentication.py",
+    "tests/data_quality/test_import_staging.py",
+    "tests/integration/test_verify_postgres_security_script.py",
+    "crm/progress/impl_CRM-019.md"
+  ],
+  "out_of_scope": [
+    "PROJECT_STATUS.html",
+    "crm/feature_list.json",
+    "crm/progress/current.md",
+    "crm/progress/history.md",
+    "crm/progress/tasks/CRM-019.json",
+    "crm/progress/validation_CRM-019.md",
+    "crm/AGENTS.md",
+    "crm/agents/",
+    "crm/adapters/",
+    "crm/harness.json",
+    "Replacing the corporate identity provider",
+    "Security through UI hiding alone",
+    "PostgreSQL credentials in source or tests"
+  ],
+  "baseline_revision": "fcbe3b4ea14e155084019f9248a909826397d188",
+  "baseline_note": "Dirty completed-feature worktree after CRM-001 through CRM-018. Preserve existing changes and PROJECT_STATUS.html. CRM-019 owns defense-in-depth HTTP settings, a restrictive local CSP, bounded request limits, safe redirect/error regression tests, dependency/static/security checks, and a documented least-privilege/RLS threat model with PostgreSQL follow-up evidence.",
+  "implementation_report": "progress/impl_CRM-019.md",
+  "validation_report": "progress/validation_CRM-019.md",
+  "implementer": "crm019_security_implementer_terra",
+  "validator": "crm019_security_validator_sol",
+  "agent_assignments": {
+    "orchestrator": {
+      "agent_id": "crm019_security_orchestrator_sol",
+      "model": "gpt-5.6-sol",
+      "reasoning_effort": "high",
+      "source": "role_default"
+    },
+    "implementer": {
+      "agent_id": "crm019_security_implementer_terra",
+      "model": "gpt-5.6-terra",
+      "reasoning_effort": "high",
+      "source": "role_default"
+    },
+    "validator": {
+      "agent_id": "crm019_security_validator_sol",
+      "model": "gpt-5.6-sol",
+      "reasoning_effort": "high",
+      "source": "role_default"
+    }
+  },
+  "architecture_decision": "Layer Django deployment security settings with a small response-header middleware for a restrictive self-hosted CSP and permissions policy. Keep ORM/output escaping and existing bounded domain services authoritative; document database roles/RLS as a PostgreSQL acceptance boundary instead of inventing application-side privilege escalation.",
+  "verification_commands": [
+    "timeout 60s ./crm/init.sh",
+    "PYTHONDONTWRITEBYTECODE=1 .venv/bin/ruff check .",
+    "PYTHONDONTWRITEBYTECODE=1 .venv/bin/ruff format --check .",
+    "PYTHONDONTWRITEBYTECODE=1 .venv/bin/mypy src",
+    "PYTHONDONTWRITEBYTECODE=1 .venv/bin/pytest -q",
+    "PYTHONDONTWRITEBYTECODE=1 .venv/bin/pytest -q tests/config/test_security_headers.py tests/identity/test_authentication.py tests/data_quality/test_import_staging.py",
+    "bash scripts/verify-security.sh",
+    "bash scripts/verify-postgres-security.sh",
+    "git diff --check"
+  ]
+}

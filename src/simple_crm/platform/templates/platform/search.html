@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+  <head>
+    {% load static %}
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description"
+          content="Búsqueda global gobernada de leads y contactos comerciales.">
+    <title>Buscar — CRM de Ventas</title>
+    <link rel="stylesheet"
+          href="{% static 'vendor/bootstrap/5.3.8/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'platform/accessibility.css' %}">
+  </head>
+  <body class="bg-body-tertiary">
+    <a class="skip-link" href="#contenido">Saltar al contenido principal</a>
+    <header class="border-bottom bg-white">
+      <div class="container py-3">
+        <nav class="d-flex flex-wrap gap-3 align-items-center"
+             aria-label="Navegación principal">
+          <a class="fw-semibold text-decoration-none"
+             href="{% url 'platform:home' %}">CRM de Ventas</a>
+          {% for item in nav_items %}
+            {% if item.available %}<a href="{{ item.url }}">{{ item.label }}</a>{% else %}<span class="text-secondary" aria-disabled="true">{{ item.label }}</span>{% endif %}
+          {% endfor %}
+        </nav>
+      </div>
+    </header>
+    <main id="contenido" class="container py-4">
+      <h1 class="h2">Buscar</h1>
+      <form method="get"
+            action="{% url 'platform:search' %}"
+            class="row g-2 mb-4"
+            role="search">
+        <div class="col-12 col-md-9">
+          <label class="visually-hidden" for="search-query">Nombre, correo, teléfono o nota</label>
+          <input id="search-query"
+                 name="q"
+                 value="{{ query }}"
+                 class="form-control"
+                 maxlength="120"
+                 placeholder="Nombre, correo, teléfono o nota"
+                 autocomplete="off">
+        </div>
+        <div class="col-12 col-md-3 d-grid">
+          <button class="btn btn-primary" type="submit">Buscar</button>
+        </div>
+      </form>
+      {% if error %}
+        <div class="alert alert-warning" role="alert">{{ error }}</div>
+      {% elif page and query %}
+        <p class="text-secondary" aria-live="polite">{{ page.total }} resultado{{ page.total|pluralize:"s" }} para “{{ page.query }}”.</p>
+        {% if page.results %}
+          <section class="row g-3" aria-label="Resultados de búsqueda">
+            {% for result in page.results %}
+              <div class="col-12 col-lg-6">
+                <article class="card h-100 shadow-sm">
+                  <div class="card-body">
+                    <h2 class="h5 mb-1"><a href="{{ result.url }}">{{ result.title }}</a></h2>
+                    <p class="text-secondary mb-2">{{ result.subtitle }}</p>
+                    <p class="small mb-1"><strong>Coincidencia:</strong> {{ result.match_reason }}</p>
+                    {% if result.snippet %}<p class="mb-0">{{ result.snippet }}</p>{% endif %}
+                  </div>
+                </article>
+              </div>
+            {% endfor %}
+          </section>
+          {% if page.next_cursor %}<a class="btn btn-outline-secondary mt-4"
+   href="?q={{ page.query|urlencode }}&amp;cursor={{ page.next_cursor }}">Ver más</a>{% endif %}
+        {% else %}
+          <section class="card border-0 shadow-sm">
+            <div class="card-body py-5 text-center">
+              <h2 class="h4">No encontramos coincidencias</h2>
+              <p class="mb-0">Probá con otro nombre, correo, teléfono o palabra de la nota.</p>
+            </div>
+          </section>
+        {% endif %}
+      {% endif %}
+    </main>
+    <script src="{% static 'vendor/htmx/2.0.10/htmx.min.js' %}" defer></script>
+  </body>
+</html>

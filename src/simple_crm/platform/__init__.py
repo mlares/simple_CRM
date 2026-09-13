@@ -1,0 +1,1 @@
+"""Operational platform Django app."""

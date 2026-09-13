@@ -1,0 +1,91 @@
+{
+  "schema_version": 1,
+  "feature_id": "CRM-007",
+  "requirement_ids": [
+    "CRM-007-R01",
+    "CRM-007-R02",
+    "CRM-007-R03",
+    "CRM-007-R04",
+    "CRM-007-R05",
+    "CRM-007-R06"
+  ],
+  "acceptance_ids": [
+    "CRM-007-AC01",
+    "CRM-007-AC02",
+    "CRM-007-AC03",
+    "CRM-007-AC04",
+    "CRM-007-AC05"
+  ],
+  "dependencies": ["CRM-004", "CRM-005", "CRM-006"],
+  "allowed_scope": [
+    "README.md",
+    "crm/docs/architecture.md",
+    "crm/docs/conventions.md",
+    "crm/docs/verification.md",
+    "crm/docs/lead_lifecycle.md",
+    "src/simple_crm/crm/models.py",
+    "src/simple_crm/crm/lead_services.py",
+    "src/simple_crm/crm/admin.py",
+    "src/simple_crm/crm/migrations/0005_lead_domain.py",
+    "tests/crm/test_lead_lifecycle.py",
+    "crm/progress/impl_CRM-007.md"
+  ],
+  "out_of_scope": [
+    "PROJECT_STATUS.html",
+    "crm/feature_list.json",
+    "crm/progress/current.md",
+    "crm/progress/history.md",
+    "crm/progress/tasks/CRM-007.json",
+    "crm/progress/validation_CRM-007.md",
+    "crm/AGENTS.md",
+    "crm/agents/",
+    "crm/adapters/",
+    "crm/harness.json",
+    "crm/scripts/",
+    "src/simple_crm/identity/",
+    "src/simple_crm/activity/",
+    "src/simple_crm/data_quality/",
+    "src/simple_crm/reporting/",
+    "src/simple_crm/platform/",
+    "Interactions, task detail, reminders, imports, merges, reporting, revenue forecasts, quotes, contracts, and clinical identity records",
+    "Production data loading or workbook cutover"
+  ],
+  "baseline_revision": "fcbe3b4ea14e155084019f9248a909826397d188",
+  "baseline_note": "Dirty completed-feature worktree after CRM-001, CRM-023, CRM-002, CRM-003, CRM-004, CRM-005, and CRM-006. Preserve all existing changes, PROJECT_STATUS.html, official vendored assets/licenses, and the staged deletion of src/simple_crm/__pycache__/__init__.cpython-312.pyc. CRM-007 owns lead lifecycle, party links, ownership, stage history, and minimal next-action commitment fields only.",
+  "implementation_report": "progress/impl_CRM-007.md",
+  "validation_report": "progress/validation_CRM-007.md",
+  "implementer": "crm007_lead_implementer_terra",
+  "validator": "crm007_lead_validator_sol",
+  "agent_assignments": {
+    "orchestrator": {
+      "agent_id": "crm007_orchestrator_sol",
+      "model": "gpt-5.6-sol",
+      "reasoning_effort": "high",
+      "source": "role_default"
+    },
+    "implementer": {
+      "agent_id": "crm007_lead_implementer_terra",
+      "model": "gpt-5.6-terra",
+      "reasoning_effort": "high",
+      "source": "role_default"
+    },
+    "validator": {
+      "agent_id": "crm007_lead_validator_sol",
+      "model": "gpt-5.6-sol",
+      "reasoning_effort": "high",
+      "source": "role_default"
+    }
+  },
+  "architecture_decision": "simple_crm.crm owns leads, role-specific party links, append-only stage history, assignment history, and the compact next-action commitment needed until CRM-008 adds first-class tasks. Identity policy remains the source of truth for campaign/team action scopes; atomic services perform authorization, locking, invariant checks, and writes together. Creation warns about existing candidates but never merges them.",
+  "verification_commands": [
+    "timeout 60s ./crm/init.sh",
+    "PYTHONDONTWRITEBYTECODE=1 .venv/bin/ruff check .",
+    "PYTHONDONTWRITEBYTECODE=1 .venv/bin/ruff format --check .",
+    "PYTHONDONTWRITEBYTECODE=1 .venv/bin/mypy src",
+    "PYTHONDONTWRITEBYTECODE=1 .venv/bin/pytest -q",
+    "DJANGO_SETTINGS_MODULE=simple_crm.config.settings.test PYTHONDONTWRITEBYTECODE=1 .venv/bin/python manage.py check",
+    "DJANGO_SETTINGS_MODULE=simple_crm.config.settings.test PYTHONDONTWRITEBYTECODE=1 .venv/bin/python manage.py makemigrations --check --dry-run",
+    "PYTHONDONTWRITEBYTECODE=1 .venv/bin/pytest -q tests/crm/test_lead_lifecycle.py",
+    "git diff --check"
+  ]
+}

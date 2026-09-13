@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+  <head>
+    {% load static %}
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description"
+          content="Indicadores comerciales gobernados con alcance y período visibles.">
+    <title>Informes — CRM de Ventas</title>
+    <link rel="stylesheet"
+          href="{% static 'vendor/bootstrap/5.3.8/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'platform/accessibility.css' %}">
+  </head>
+  <body class="bg-body-tertiary">
+    <a class="skip-link" href="#contenido">Saltar al contenido principal</a>
+    <header class="border-bottom bg-white">
+      <div class="container py-3">
+        <nav class="d-flex flex-wrap gap-3 align-items-center"
+             aria-label="Navegación principal">
+          <a class="fw-semibold text-decoration-none"
+             href="{% url 'platform:home' %}">CRM de Ventas</a>
+          {% for item in nav_items %}
+            {% if item.available %}<a href="{{ item.url }}">{{ item.label }}</a>{% else %}<span class="text-secondary" aria-disabled="true">{{ item.label }}</span>{% endif %}
+          {% endfor %}
+        </nav>
+      </div>
+    </header>
+    <main id="contenido" class="container py-4">
+      <div class="d-flex justify-content-between align-items-end mb-4"><div><p class="text-secondary mb-1">Indicadores gobernados</p><h1 class="h2 mb-0">Informes</h1></div>{% if report %}<span class="badge text-bg-light">{{ report.result_count }} leads</span>{% endif %}</div>
+      {% if error %}<div class="alert alert-warning" role="alert">{{ error }}</div>{% endif %}
+      <form method="get"
+            action="{% url 'platform:reports' %}"
+            class="card card-body shadow-sm mb-4 row g-3">
+        <div class="col-12 col-md-4">
+          <label class="form-label" for="from">Desde</label><input class="form-control"
+       type="date"
+       id="from"
+       name="from"
+       value="{{ selected.from }}">
+        </div>
+        <div class="col-12 col-md-4">
+          <label class="form-label" for="to">Hasta</label><input class="form-control"
+       type="date"
+       id="to"
+       name="to"
+       value="{{ selected.to }}">
+        </div>
+        <div class="col-12 col-md-4 d-flex align-items-end">
+          <button class="btn btn-primary" type="submit">Actualizar</button>
+        </div>
+      </form>
+      {% if report %}
+        <section aria-labelledby="metadata-title" class="card shadow-sm mb-4">
+          <div class="card-body">
+            <h2 id="metadata-title" class="h5">Definición del informe</h2>
+            <p class="mb-1"><strong>Período:</strong> {{ report.start_date|date:"j/m/Y" }} — {{ report.end_date|date:"j/m/Y" }}</p>
+            <p class="mb-1"><strong>Alcance:</strong> {{ report.scope_label }}</p>
+            <p class="mb-1"><strong>Actualización:</strong> {{ report.freshness_label }}</p>
+            <p class="mb-0"><strong>Calculado:</strong> {{ report.as_of|date:"j/m/Y H:i" }}</p>
+          </div>
+        </section>
+        <section class="row g-3 mb-4" aria-label="Indicadores principales">{% for metric in report.metrics %}<div class="col-12 col-md-4"><article class="card h-100"><div class="card-body"><h2 class="h6">{{ metric.label }}</h2><p class="display-6 mb-1">{{ metric.value }}</p><p class="small text-secondary mb-0">{{ metric.definition.description }} · v{{ metric.definition.version }}</p></div></article></div>{% endfor %}</section>
+        <section class="row g-3" aria-label="Dimensiones del informe">{% for section in report.sections %}<div class="col-12 col-lg-6"><article class="card h-100"><div class="card-body"><h2 class="h5">{{ section.title }}</h2><ul class="list-group list-group-flush">{% for row in section.rows %}<li class="list-group-item d-flex justify-content-between px-0"><span>{{ row.label }}</span><strong>{{ row.value }}</strong></li>{% empty %}<li class="list-group-item px-0 text-secondary">Sin datos para el período.</li>{% endfor %}</ul></div></article></div>{% endfor %}</section>
+      {% endif %}
+    </main>
+    <script src="{% static 'vendor/htmx/2.0.10/htmx.min.js' %}" defer></script>
+  </body>
+</html>

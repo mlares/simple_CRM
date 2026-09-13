@@ -1,0 +1,101 @@
+{
+  "schema_version": 1,
+  "feature_id": "CRM-004",
+  "requirement_ids": [
+    "CRM-004-R01",
+    "CRM-004-R02",
+    "CRM-004-R03",
+    "CRM-004-R04",
+    "CRM-004-R05"
+  ],
+  "acceptance_ids": [
+    "CRM-004-AC01",
+    "CRM-004-AC02",
+    "CRM-004-AC03",
+    "CRM-004-AC04"
+  ],
+  "dependencies": [
+    "CRM-003"
+  ],
+  "allowed_scope": [
+    "README.md",
+    ".env.example",
+    "scripts/verify-fast.sh",
+    "scripts/verify-clean.sh",
+    "scripts/verify-postgres-catalogs.sh",
+    "src/simple_crm/crm/",
+    "tests/crm/",
+    "tests/integration/test_verify_postgres_catalogs_script.py",
+    "crm/docs/architecture.md",
+    "crm/docs/conventions.md",
+    "crm/docs/verification.md",
+    "crm/progress/impl_CRM-004.md"
+  ],
+  "out_of_scope": [
+    "PROJECT_STATUS.html",
+    "crm/feature_list.json",
+    "crm/progress/current.md",
+    "crm/progress/history.md",
+    "crm/progress/tasks/CRM-004.json",
+    "crm/progress/validation_CRM-004.md",
+    "crm/AGENTS.md",
+    "crm/agents/",
+    "crm/adapters/",
+    "crm/harness.json",
+    "crm/scripts/harness_check.py",
+    "crm/tests/",
+    "src/simple_crm/activity/",
+    "src/simple_crm/data_quality/",
+    "src/simple_crm/identity/",
+    "src/simple_crm/platform/",
+    "src/simple_crm/reporting/",
+    "src/simple_crm/__pycache__/",
+    "Sales-domain lead, interaction, contact, party, task, and assignment records",
+    "Custom user fields, OIDC, teams, object scopes, and the full CRM-005 role model",
+    "Arbitrary user-defined database fields or automatic taxonomy generation",
+    "Production provider or database provisioning"
+  ],
+  "baseline_revision": "fcbe3b4ea14e155084019f9248a909826397d188",
+  "baseline_note": "Dirty completed-feature worktree after CRM-001, CRM-023, CRM-002, and CRM-003. Preserve every existing change, uncommitted PROJECT_STATUS.html, official vendored assets/licenses, and the staged deletion of src/simple_crm/__pycache__/__init__.cpython-312.pyc. CRM-004 may add only catalog-domain persistence and minimal built-in Django group/permission integration; it must not preempt CRM-005 identity/team/OIDC scope or add sales records.",
+  "implementation_report": "progress/impl_CRM-004.md",
+  "validation_report": "progress/validation_CRM-004.md",
+  "implementer": "crm004_catalog_implementer_terra",
+  "validator": "crm002_foundation_validator",
+  "agent_assignments": {
+    "orchestrator": {
+      "agent_id": "crm002_orchestrator",
+      "model": "gpt-5.6-sol",
+      "reasoning_effort": "high",
+      "source": "role_default"
+    },
+    "implementer": {
+      "agent_id": "crm004_catalog_implementer_terra",
+      "model": "gpt-5.6-terra",
+      "reasoning_effort": "high",
+      "source": "role_default"
+    },
+    "validator": {
+      "agent_id": "crm002_foundation_validator",
+      "model": "gpt-5.6-sol",
+      "reasoning_effort": "high",
+      "source": "role_default"
+    }
+  },
+  "architecture_decision": "The existing simple_crm.crm app is the durable owner of campaign, lead-status, interaction-channel/outcome, specialty, and geography catalogs. Django admin plus built-in auth groups/permissions is the temporary maintenance surface; CRM-005 retains ownership of complete identity, teams, OIDC, and scoped authorization.",
+  "postgres_acceptance_command": "UV_CACHE_DIR=/tmp/uv-cache timeout 120s bash scripts/verify-postgres-catalogs.sh",
+  "verification_commands": [
+    "timeout 60s ./crm/init.sh",
+    "PYTHONDONTWRITEBYTECODE=1 .venv/bin/ruff check .",
+    "PYTHONDONTWRITEBYTECODE=1 .venv/bin/ruff format --check .",
+    "PYTHONDONTWRITEBYTECODE=1 .venv/bin/mypy src",
+    "PYTHONDONTWRITEBYTECODE=1 .venv/bin/pytest -q",
+    "DJANGO_SETTINGS_MODULE=simple_crm.config.settings.test PYTHONDONTWRITEBYTECODE=1 .venv/bin/python manage.py check",
+    "DJANGO_SETTINGS_MODULE=simple_crm.config.settings.test PYTHONDONTWRITEBYTECODE=1 .venv/bin/python manage.py makemigrations --check --dry-run",
+    "PYTHONDONTWRITEBYTECODE=1 .venv/bin/pytest -q tests/crm tests/integration/test_verify_postgres_catalogs_script.py",
+    "bash scripts/verify-vendored-assets.sh",
+    "bash scripts/verify-repository-safety.sh",
+    "UV_CACHE_DIR=/tmp/uv-cache timeout 120s bash scripts/verify-clean.sh",
+    "UV_CACHE_DIR=/tmp/uv-cache timeout 120s bash scripts/verify-postgres-catalogs.sh",
+    "git diff --check"
+  ]
+}

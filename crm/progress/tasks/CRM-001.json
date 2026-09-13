@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "feature_id": "CRM-001",
+  "requirement_ids": [
+    "CRM-001-R04",
+    "CRM-001-R06"
+  ],
+  "acceptance_ids": [
+    "CRM-001-AC02",
+    "CRM-001-AC04"
+  ],
+  "dependencies": [],
+  "allowed_scope": [
+    "crm/scripts/harness_check.py",
+    "crm/tests/test_harness_check.py",
+    "crm/progress/impl_CRM-001.md"
+  ],
+  "out_of_scope": [
+    "crm/feature_list.json",
+    "crm/progress/current.md",
+    "crm/progress/history.md",
+    "crm/AGENTS.md",
+    "crm/agents/roles/orchestrator.md",
+    "crm/agents/roles/validator.md",
+    "crm/adapters/",
+    "src/"
+  ],
+  "baseline_revision": "fcbe3b4ea14e155084019f9248a909826397d188",
+  "baseline_note": "CRM-001 closure-check failure after approval: system Python reaches done-state report validation but does not support str.removesuffix. Apply only the compatibility fix and focused regression coverage; preserve every existing user and agent change.",
+  "implementation_report": "progress/impl_CRM-001.md",
+  "validation_report": "progress/validation_CRM-001.md",
+  "implementer": "crm001_harness_implementer",
+  "validator": "crm001_harness_validator",
+  "verification_commands": [
+    "cd crm && ./init.sh",
+    "UV_CACHE_DIR=/tmp/uv-cache uv run ruff check .",
+    "UV_CACHE_DIR=/tmp/uv-cache uv run pytest -q",
+    "git diff --check"
+  ]
+}

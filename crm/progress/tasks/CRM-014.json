@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "feature_id": "CRM-014",
+  "requirement_ids": [
+    "CRM-014-R01",
+    "CRM-014-R02",
+    "CRM-014-R03",
+    "CRM-014-R04",
+    "CRM-014-R05",
+    "CRM-014-R06"
+  ],
+  "acceptance_ids": [
+    "CRM-014-AC01",
+    "CRM-014-AC02",
+    "CRM-014-AC03",
+    "CRM-014-AC04",
+    "CRM-014-AC05"
+  ],
+  "dependencies": ["CRM-007", "CRM-008", "CRM-013"],
+  "allowed_scope": [
+    "README.md",
+    "crm/docs/architecture.md",
+    "crm/docs/conventions.md",
+    "crm/docs/verification.md",
+    "crm/docs/reports.md",
+    "src/simple_crm/reporting/models.py",
+    "src/simple_crm/reporting/metrics.py",
+    "src/simple_crm/reporting/migrations/0002_metric_catalog.py",
+    "src/simple_crm/platform/views.py",
+    "src/simple_crm/platform/urls.py",
+    "src/simple_crm/platform/templates/platform/reports.html",
+    "tests/reporting/test_metrics.py",
+    "tests/platform/test_reports_page.py",
+    "crm/progress/impl_CRM-014.md"
+  ],
+  "out_of_scope": [
+    "PROJECT_STATUS.html",
+    "crm/feature_list.json",
+    "crm/progress/current.md",
+    "crm/progress/history.md",
+    "crm/progress/tasks/CRM-014.json",
+    "crm/progress/validation_CRM-014.md",
+    "crm/AGENTS.md",
+    "crm/agents/",
+    "crm/adapters/",
+    "crm/harness.json",
+    "crm/scripts/",
+    "src/simple_crm/identity/",
+    "src/simple_crm/data_quality/",
+    "CRM-015 exports, arbitrary SQL metrics, and cross-system warehouses"
+  ],
+  "baseline_revision": "fcbe3b4ea14e155084019f9248a909826397d188",
+  "baseline_note": "Dirty completed-feature worktree after CRM-001 through CRM-013. Preserve all existing changes, PROJECT_STATUS.html, official vendored assets/licenses, and staged repository changes. CRM-014 owns read-only governed metric definitions and dashboards only.",
+  "implementation_report": "progress/impl_CRM-014.md",
+  "validation_report": "progress/validation_CRM-014.md",
+  "implementer": "crm014_metrics_implementer_terra",
+  "validator": "crm014_metrics_validator_sol",
+  "agent_assignments": {
+    "orchestrator": {
+      "agent_id": "crm014_orchestrator_sol",
+      "model": "gpt-5.6-sol",
+      "reasoning_effort": "high",
+      "source": "role_default"
+    },
+    "implementer": {
+      "agent_id": "crm014_metrics_implementer_terra",
+      "model": "gpt-5.6-terra",
+      "reasoning_effort": "high",
+      "source": "role_default"
+    },
+    "validator": {
+      "agent_id": "crm014_metrics_validator_sol",
+      "model": "gpt-5.6-sol",
+      "reasoning_effort": "high",
+      "source": "role_default"
+    }
+  },
+  "architecture_decision": "Metric definitions are durable, versioned catalog records owned by reporting. Read-only dashboard services calculate approved KPIs and dimensions from visible leads and occurrence dates, return definition/timeframe/scope/as-of metadata, and never let templates encode metric semantics.",
+  "verification_commands": [
+    "timeout 60s ./crm/init.sh",
+    "PYTHONDONTWRITEBYTECODE=1 .venv/bin/ruff check .",
+    "PYTHONDONTWRITEBYTECODE=1 .venv/bin/ruff format --check .",
+    "PYTHONDONTWRITEBYTECODE=1 .venv/bin/mypy src",
+    "PYTHONDONTWRITEBYTECODE=1 .venv/bin/pytest -q",
+    "DJANGO_SETTINGS_MODULE=simple_crm.config.settings.test PYTHONDONTWRITEBYTECODE=1 .venv/bin/python manage.py check",
+    "DJANGO_SETTINGS_MODULE=simple_crm.config.settings.test PYTHONDONTWRITEBYTECODE=1 .venv/bin/python manage.py makemigrations --check --dry-run",
+    "PYTHONDONTWRITEBYTECODE=1 .venv/bin/pytest -q tests/reporting/test_metrics.py tests/platform/test_reports_page.py",
+    "git diff --check"
+  ]
+}

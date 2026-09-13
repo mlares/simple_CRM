@@ -1,0 +1,89 @@
+{
+  "schema_version": 1,
+  "feature_id": "CRM-012",
+  "requirement_ids": [
+    "CRM-012-R01",
+    "CRM-012-R02",
+    "CRM-012-R03",
+    "CRM-012-R04",
+    "CRM-012-R05"
+  ],
+  "acceptance_ids": [
+    "CRM-012-AC01",
+    "CRM-012-AC02",
+    "CRM-012-AC03",
+    "CRM-012-AC04",
+    "CRM-012-AC05"
+  ],
+  "dependencies": ["CRM-006", "CRM-007", "CRM-008"],
+  "allowed_scope": [
+    "README.md",
+    "crm/docs/architecture.md",
+    "crm/docs/conventions.md",
+    "crm/docs/verification.md",
+    "crm/docs/search.md",
+    "src/simple_crm/reporting/search.py",
+    "src/simple_crm/platform/views.py",
+    "src/simple_crm/platform/urls.py",
+    "src/simple_crm/platform/templates/platform/search.html",
+    "tests/reporting/test_search.py",
+    "tests/platform/test_search_page.py",
+    "crm/progress/impl_CRM-012.md"
+  ],
+  "out_of_scope": [
+    "PROJECT_STATUS.html",
+    "crm/feature_list.json",
+    "crm/progress/current.md",
+    "crm/progress/history.md",
+    "crm/progress/tasks/CRM-012.json",
+    "crm/progress/validation_CRM-012.md",
+    "crm/AGENTS.md",
+    "crm/agents/",
+    "crm/adapters/",
+    "crm/harness.json",
+    "crm/scripts/",
+    "src/simple_crm/identity/",
+    "src/simple_crm/data_quality/",
+    "CRM-013 filters, CRM-014 reports, CRM-015 exports, and search-driven merging",
+    "Elasticsearch or OpenSearch",
+    "Automatic merging from search similarity"
+  ],
+  "baseline_revision": "fcbe3b4ea14e155084019f9248a909826397d188",
+  "baseline_note": "Dirty completed-feature worktree after CRM-001 through CRM-011. Preserve all existing changes, PROJECT_STATUS.html, official vendored assets/licenses, and staged repository changes. CRM-012 owns bounded permission-scoped search and the user-facing search endpoint only.",
+  "implementation_report": "progress/impl_CRM-012.md",
+  "validation_report": "progress/validation_CRM-012.md",
+  "implementer": "crm012_search_implementer_terra",
+  "validator": "crm012_search_validator_sol",
+  "agent_assignments": {
+    "orchestrator": {
+      "agent_id": "crm012_orchestrator_sol",
+      "model": "gpt-5.6-sol",
+      "reasoning_effort": "high",
+      "source": "role_default"
+    },
+    "implementer": {
+      "agent_id": "crm012_search_implementer_terra",
+      "model": "gpt-5.6-terra",
+      "reasoning_effort": "high",
+      "source": "role_default"
+    },
+    "validator": {
+      "agent_id": "crm012_search_validator_sol",
+      "model": "gpt-5.6-sol",
+      "reasoning_effort": "high",
+      "source": "role_default"
+    }
+  },
+  "architecture_decision": "Build a bounded search service that derives visible leads first through the centralized VIEW policy, then searches party identity, aliases, normalized contact identifiers, lead numbers, and authorized activity/task text. Use exact identifiers first, normalized text and PostgreSQL full-text/trigram annotations when PostgreSQL is active, and deterministic Python fallback ranking for the test backend. Return match reasons and stable cursors without exposing out-of-scope rows, counts, or snippets.",
+  "verification_commands": [
+    "timeout 60s ./crm/init.sh",
+    "PYTHONDONTWRITEBYTECODE=1 .venv/bin/ruff check .",
+    "PYTHONDONTWRITEBYTECODE=1 .venv/bin/ruff format --check .",
+    "PYTHONDONTWRITEBYTECODE=1 .venv/bin/mypy src",
+    "PYTHONDONTWRITEBYTECODE=1 .venv/bin/pytest -q",
+    "DJANGO_SETTINGS_MODULE=simple_crm.config.settings.test PYTHONDONTWRITEBYTECODE=1 .venv/bin/python manage.py check",
+    "DJANGO_SETTINGS_MODULE=simple_crm.config.settings.test PYTHONDONTWRITEBYTECODE=1 .venv/bin/python manage.py makemigrations --check --dry-run",
+    "PYTHONDONTWRITEBYTECODE=1 .venv/bin/pytest -q tests/reporting/test_search.py tests/platform/test_search.py",
+    "git diff --check"
+  ]
+}

@@ -1,0 +1,1889 @@
+{
+  "schema_version": 2,
+  "project": "crm",
+  "product_name": "DigPatho Sales Hub",
+  "description": "A Spanish-first internal CRM that lets a non-technical sales team maintain normalized prospect data, manage follow-up work, and answer governed business questions without using SQL.",
+  "source_artifacts": [
+    {
+      "path": "../sales_crm_application_plan.html",
+      "purpose": "Approved product, architecture, migration, security, and delivery baseline"
+    },
+    {
+      "path": "../Ventas_normalizada_pre_SQL.xlsx",
+      "purpose": "Normalized pre-SQL migration source and reconciliation baseline"
+    },
+    {
+      "path": "../proposed_sales_schema.sql",
+      "purpose": "Initial relational-model proposal; Django migrations become authoritative once implemented"
+    },
+    {
+      "path": "../sales_data_reengineering_report.md",
+      "purpose": "Source-structure, relationship, and data-quality assessment"
+    }
+  ],
+  "agent_workflow": {
+    "orchestrator": "Owns feature selection, specification readiness, dependencies, state transitions, and final closure; it does not edit application implementation while coordinating a feature.",
+    "implementer": "Implements exactly one selected feature and its verification without reviewing or approving its own work.",
+    "validator": "Independently inspects the specification, actual diff, tests, and runtime evidence; it never edits implementation files.",
+    "explorer": "Optionally answers one bounded read-only question before implementation and records evidence on disk.",
+    "execution_order": [
+      "orchestrator",
+      "explorer_optional",
+      "implementer",
+      "validator",
+      "orchestrator_close"
+    ]
+  },
+  "rules": {
+    "one_feature_at_a_time": true,
+    "require_verification_to_close": true,
+    "require_independent_validation": true,
+    "require_dependencies_done": true,
+    "require_acceptance_evidence": true,
+    "specification_changes_require_revalidation": true,
+    "valid_status": [
+      "pending",
+      "in_progress",
+      "review",
+      "changes_requested",
+      "done",
+      "blocked"
+    ]
+  },
+  "architecture_constraints": [
+    "Use Python 3.12 or later with Django 5.2 LTS.",
+    "Use a modular monolith with explicit CRM, activity, data-quality, reporting, identity, and platform boundaries.",
+    "Use server-rendered Django templates enhanced progressively with HTMX and locally vendored Bootstrap assets.",
+    "Use PostgreSQL 18 as the production system of record; SQLite must not be used to validate PostgreSQL-specific behavior.",
+    "Keep business rules in application services and database constraints rather than templates, views, or ad hoc scripts.",
+    "Use PostgreSQL full-text search and pg_trgm before introducing a separate search service.",
+    "Use a PostgreSQL transactional outbox worker before introducing Redis, Celery, or a message broker.",
+    "Use governed reporting views and metric definitions; do not expose arbitrary SQL to users.",
+    "Use OIDC with provider-managed MFA as the target authentication method, with local accounts only as a documented temporary fallback.",
+    "Preserve raw source evidence, normalized values, lineage, aliases, status history, and append-only audit events.",
+    "Archive routine business records instead of destructive deletion; immutable source, history, and audit records are not user-deletable.",
+    "Store timestamps in UTC and display business dates in America/Argentina/Cordoba unless a team-specific timezone is configured.",
+    "Do not store patient identifiers, pathology results, or clinical case data; this is a sales CRM, not a clinical system.",
+    "Do not add microservices, a SPA framework, a data warehouse, or free-form AI-to-SQL in the MVP without an approved architecture decision."
+  ],
+  "definition_of_ready": [
+    "The feature has a bounded user or platform outcome and explicit in-scope and out-of-scope statements.",
+    "All dependency features are done or the orchestrator documents why the dependency is not required.",
+    "Every requirement and acceptance criterion has a stable unique identifier.",
+    "Acceptance criteria are observable and have an automated test or a justified manual procedure.",
+    "Permissions, data ownership, failure behavior, migration impact, and rollback implications are specified when applicable.",
+    "There are no unresolved questions that would materially change the implementation."
+  ],
+  "definition_of_done": [
+    "Every acceptance criterion has concrete evidence in the implementation and validation reports.",
+    "The configured fast verification command and all feature-specific verification commands pass.",
+    "The implementation follows the architecture, conventions, security, privacy, and accessibility contracts.",
+    "Database changes include reviewed migrations, constraints, rollback considerations, and representative tests.",
+    "User-facing changes include Spanish copy, understandable errors, permissions, responsive behavior, and empty states.",
+    "No unrelated changes, debug artifacts, secrets, or generated caches are included.",
+    "An independent validator records APPROVED and the orchestrator records both report paths before setting the feature to done."
+  ],
+  "success_metrics": [
+    "At least 90 percent of active sellers use the application on four or more workdays per week during the first 90 days.",
+    "At least 90 percent of completed contacts are logged within 24 hours.",
+    "At least 95 percent of open in-progress leads have a next task or a documented reason.",
+    "No error-level migration item remains unresolved at cutover and fewer than 5 percent of active records have warnings after 60 days.",
+    "Every management KPI has an owner, definition, timeframe, scope, and fixture-backed expected result.",
+    "The median quick-contact workflow takes less than 60 seconds in usability testing.",
+    "The service achieves 99.5 percent monthly availability after launch.",
+    "List and search interactions meet a 500 millisecond p95 server-response target at the agreed initial data volume; standard dashboards meet a 2 second p95 target."
+  ],
+  "deferred_scope": [
+    "Marketing automation and mass-email campaign orchestration",
+    "Billing, inventory, contracts, and ERP functions",
+    "Patient, specimen, pathology-result, or other clinical workflows",
+    "Native mobile or offline-first applications",
+    "A generic opportunity, quote, or revenue-forecast model unless discovery proves it is required",
+    "A separate search cluster or analytics warehouse before measured PostgreSQL limits",
+    "Free-form natural-language-to-SQL or any autonomous write-capable AI agent"
+  ],
+  "features": [
+    {
+      "id": "CRM-001",
+      "title": "Spec-driven agent delivery harness",
+      "phase": "Foundation",
+      "priority": "P0",
+      "status": "done",
+      "status_history": [
+        "pending",
+        "in_progress",
+        "review",
+        "changes_requested",
+        "in_progress",
+        "review",
+        "changes_requested",
+        "in_progress",
+        "review",
+        "done"
+      ],
+      "task_envelope": "progress/tasks/CRM-001.json",
+      "implementation_report": "progress/impl_CRM-001.md",
+      "validation_report": "progress/validation_CRM-001.md",
+      "depends_on": [],
+      "user_story": "As the workflow owner, I need orchestrator, implementer, and validator agents to execute one approved feature at a time with durable evidence.",
+      "requirements": [
+        {
+          "id": "CRM-001-R01",
+          "statement": "Make orchestrator, implementer, and validator the canonical role names; retain explorer as an optional read-only supporting role."
+        },
+        {
+          "id": "CRM-001-R02",
+          "statement": "Define exclusive ownership of feature state, implementation files, implementation reports, and validation reports."
+        },
+        {
+          "id": "CRM-001-R03",
+          "statement": "Require the orchestrator task envelope to include feature ID, requirements, acceptance IDs, dependencies, allowed scope, report path, baseline revision, and exact verification commands."
+        },
+        {
+          "id": "CRM-001-R04",
+          "statement": "Extend harness validation to check dependency integrity, one active feature, required report paths, legal status transitions, and evidence for every acceptance criterion."
+        },
+        {
+          "id": "CRM-001-R05",
+          "statement": "Provide reusable implementation and validation report templates and update all runtime adapters to reference the canonical roles."
+        },
+        {
+          "id": "CRM-001-R06",
+          "statement": "Add automated tests for harness metadata checks and configure a non-empty deterministic verification command."
+        }
+      ],
+      "acceptance": [
+        {
+          "id": "CRM-001-AC01",
+          "criterion": "The canonical workflow is orchestrator to optional explorer to implementer to validator to orchestrator closure, with a documented changes-requested loop.",
+          "evidence": "Role files, AGENTS.md, and adapter inspection"
+        },
+        {
+          "id": "CRM-001-AC02",
+          "criterion": "The harness rejects duplicate IDs, missing dependencies, dependency cycles, more than one active feature, missing acceptance evidence, and a done feature without an approved validation report.",
+          "evidence": "Automated positive and negative harness tests"
+        },
+        {
+          "id": "CRM-001-AC03",
+          "criterion": "The implementer cannot be designated as validator for the same feature, and the validator is instructed to change only its report file.",
+          "evidence": "Metadata validation and role-contract test fixtures"
+        },
+        {
+          "id": "CRM-001-AC04",
+          "criterion": "Running crm/init.sh executes both harness validation and the configured project verification command successfully.",
+          "evidence": "Captured crm/init.sh output"
+        }
+      ],
+      "out_of_scope": [
+        "Implementing CRM business functionality",
+        "Selecting a cloud provider"
+      ]
+    },
+    {
+      "id": "CRM-002",
+      "title": "Django project and developer foundation",
+      "phase": "Foundation",
+      "priority": "P0",
+      "status": "done",
+      "status_history": [
+        "pending",
+        "in_progress",
+        "blocked",
+        "in_progress",
+        "review",
+        "changes_requested",
+        "in_progress",
+        "review",
+        "done"
+      ],
+      "task_envelope": "progress/tasks/CRM-002.json",
+      "implementation_report": "progress/impl_CRM-002.md",
+      "validation_report": "progress/validation_CRM-002.md",
+      "depends_on": [
+        "CRM-001",
+        "CRM-023"
+      ],
+      "user_story": "As a developer, I need a reproducible Django application skeleton so every later feature shares the same tested foundation.",
+      "requirements": [
+        {
+          "id": "CRM-002-R01",
+          "statement": "Create the Django project under the existing src layout with explicit modules for config, CRM, activity, data quality, reporting, identity, and platform concerns."
+        },
+        {
+          "id": "CRM-002-R02",
+          "statement": "Provide development, test, staging, and production settings with environment-variable configuration and safe production defaults."
+        },
+        {
+          "id": "CRM-002-R03",
+          "statement": "Configure Spanish as the primary UI language, UTC storage, and America/Argentina/Cordoba display timezone."
+        },
+        {
+          "id": "CRM-002-R04",
+          "statement": "Add deterministic commands for formatting, linting, type checking, tests, migrations checks, and Django deployment checks."
+        },
+        {
+          "id": "CRM-002-R05",
+          "statement": "Expose liveness and readiness endpoints that do not disclose secrets or internal diagnostics."
+        }
+      ],
+      "acceptance": [
+        {
+          "id": "CRM-002-AC01",
+          "criterion": "A clean UV environment can install the lockfile, run Django system checks, and execute the complete fast verification script.",
+          "evidence": "Clean-environment command output"
+        },
+        {
+          "id": "CRM-002-AC02",
+          "criterion": "The application starts with documented development settings and renders a Spanish landing or sign-in page without a JavaScript build step.",
+          "evidence": "Django integration test and manual browser check"
+        },
+        {
+          "id": "CRM-002-AC03",
+          "criterion": "Readiness fails when its required database dependency is unavailable while liveness remains suitable for process monitoring.",
+          "evidence": "Endpoint tests with available and unavailable database"
+        },
+        {
+          "id": "CRM-002-AC04",
+          "criterion": "Production configuration rejects missing secret keys, debug mode, insecure cookies, and invalid host configuration.",
+          "evidence": "Settings tests and Django deployment check"
+        }
+      ],
+      "out_of_scope": [
+        "Business-domain models",
+        "Cloud deployment"
+      ]
+    },
+    {
+      "id": "CRM-003",
+      "title": "PostgreSQL persistence and environment configuration",
+      "phase": "Foundation",
+      "priority": "P0",
+      "status": "done",
+      "status_history": [
+        "pending",
+        "in_progress",
+        "review",
+        "changes_requested",
+        "in_progress",
+        "review",
+        "changes_requested",
+        "blocked",
+        "in_progress",
+        "review",
+        "changes_requested",
+        "in_progress",
+        "review",
+        "done"
+      ],
+      "task_envelope": "progress/tasks/CRM-003.json",
+      "implementation_report": "progress/impl_CRM-003.md",
+      "validation_report": "progress/validation_CRM-003.md",
+      "depends_on": [
+        "CRM-002"
+      ],
+      "user_story": "As the technical owner, I need PostgreSQL-backed persistence and repeatable environments so production behavior is tested before release.",
+      "requirements": [
+        {
+          "id": "CRM-003-R01",
+          "statement": "Use PostgreSQL 18 for development integration, staging, production, and database-specific automated tests."
+        },
+        {
+          "id": "CRM-003-R02",
+          "statement": "Configure connections from DATABASE_URL with bounded connection lifetimes, transaction-safe settings, and no credentials committed to source control."
+        },
+        {
+          "id": "CRM-003-R03",
+          "statement": "Enable required PostgreSQL extensions through migrations, including pg_trgm when search is introduced."
+        },
+        {
+          "id": "CRM-003-R04",
+          "statement": "Vendor and version Bootstrap and HTMX assets locally and collect versioned static assets for production."
+        },
+        {
+          "id": "CRM-003-R05",
+          "statement": "Document environment bootstrap, migration, fixture, reset, and verification procedures without destructive broad-path commands."
+        }
+      ],
+      "acceptance": [
+        {
+          "id": "CRM-003-AC01",
+          "criterion": "Migrations apply from an empty PostgreSQL database and re-running migrations is a no-op.",
+          "evidence": "Migration integration test"
+        },
+        {
+          "id": "CRM-003-AC02",
+          "criterion": "Application startup fails with an actionable error when required database configuration is absent or malformed.",
+          "evidence": "Configuration tests"
+        },
+        {
+          "id": "CRM-003-AC03",
+          "criterion": "The main page loads all required CSS and HTMX assets without a public CDN or Node.js runtime.",
+          "evidence": "Static-file integration test and network inspection"
+        },
+        {
+          "id": "CRM-003-AC04",
+          "criterion": "No secret, real credential, or production customer data is present in tracked configuration or test fixtures.",
+          "evidence": "Repository secret scan and fixture review"
+        }
+      ],
+      "out_of_scope": [
+        "Production provider provisioning",
+        "Database schema for sales entities"
+      ]
+    },
+    {
+      "id": "CRM-004",
+      "title": "Reference catalogs and controlled taxonomies",
+      "phase": "Data foundation",
+      "priority": "P0",
+      "status": "done",
+      "status_history": [
+        "pending",
+        "in_progress",
+        "review",
+        "changes_requested",
+        "in_progress",
+        "review",
+        "done"
+      ],
+      "task_envelope": "progress/tasks/CRM-004.json",
+      "implementation_report": "progress/impl_CRM-004.md",
+      "validation_report": "progress/validation_CRM-004.md",
+      "depends_on": [
+        "CRM-003"
+      ],
+      "user_story": "As a data steward, I need controlled catalogs so stages, channels, outcomes, specialties, campaigns, and geography remain consistent while labels stay understandable.",
+      "requirements": [
+        {
+          "id": "CRM-004-R01",
+          "statement": "Model campaign, lead status, interaction channel, interaction outcome, specialty, country, province, and locality as controlled reference data."
+        },
+        {
+          "id": "CRM-004-R02",
+          "statement": "Use immutable stable codes and editable Spanish display labels, sort order, active state, and effective behavior flags."
+        },
+        {
+          "id": "CRM-004-R03",
+          "statement": "Prevent deactivation or code changes from corrupting historical records; inactive values remain readable but unavailable for new selection."
+        },
+        {
+          "id": "CRM-004-R04",
+          "statement": "Seed approved baseline values through idempotent data migrations or versioned fixtures."
+        },
+        {
+          "id": "CRM-004-R05",
+          "statement": "Restrict catalog maintenance to data stewards or system administrators and audit every change."
+        }
+      ],
+      "acceptance": [
+        {
+          "id": "CRM-004-AC01",
+          "criterion": "Repeated baseline loading produces exactly one row per stable code and does not overwrite an explicitly approved label change.",
+          "evidence": "Idempotency and preservation tests"
+        },
+        {
+          "id": "CRM-004-AC02",
+          "criterion": "Inactive reference values remain visible on existing records but cannot be selected for new records.",
+          "evidence": "Model, form, and request tests"
+        },
+        {
+          "id": "CRM-004-AC03",
+          "criterion": "Unauthorized users cannot create, edit, reorder, or deactivate catalog entries through direct URLs or crafted requests.",
+          "evidence": "Permission matrix tests"
+        },
+        {
+          "id": "CRM-004-AC04",
+          "criterion": "Foreign keys and uniqueness constraints prevent unknown and duplicate reference codes independently of form validation.",
+          "evidence": "PostgreSQL constraint tests"
+        }
+      ],
+      "out_of_scope": [
+        "User-defined arbitrary database fields",
+        "Automatic taxonomy generation"
+      ]
+    },
+    {
+      "id": "CRM-005",
+      "title": "Identity, roles, teams, and scoped authorization",
+      "phase": "Data foundation",
+      "priority": "P0",
+      "status": "done",
+      "status_history": [
+        "pending",
+        "in_progress",
+        "review",
+        "done"
+      ],
+      "task_envelope": "progress/tasks/CRM-005.json",
+      "implementation_report": "progress/impl_CRM-005.md",
+      "validation_report": "progress/validation_CRM-005.md",
+      "depends_on": [
+        "CRM-003"
+      ],
+      "user_story": "As a seller, I need to sign in safely and see only the sales records and actions assigned to my role and team.",
+      "requirements": [
+        {
+          "id": "CRM-005-R01",
+          "statement": "Support sales representative, sales manager, data steward, report viewer, privacy/audit reviewer, and system administrator roles."
+        },
+        {
+          "id": "CRM-005-R02",
+          "statement": "Apply deny-by-default authorization using both an action permission and an object/team/campaign scope."
+        },
+        {
+          "id": "CRM-005-R03",
+          "statement": "Use OIDC authorization-code flow with provider MFA and centralized disablement; provide a documented Argon2 local-account fallback only when OIDC is unavailable."
+        },
+        {
+          "id": "CRM-005-R04",
+          "statement": "Treat view, create, change, reassign, merge, import, resolve-quality, audit-view, and bulk-export as distinct permissions."
+        },
+        {
+          "id": "CRM-005-R05",
+          "statement": "Support temporary administrative elevation with reason, approver, expiry, and audit event."
+        },
+        {
+          "id": "CRM-005-R06",
+          "statement": "Centralize scope-aware query services so search, detail pages, reports, exports, and direct object URLs apply identical visibility rules."
+        }
+      ],
+      "acceptance": [
+        {
+          "id": "CRM-005-AC01",
+          "criterion": "A disabled identity cannot establish a session and an existing session is invalidated according to the documented offboarding policy.",
+          "evidence": "Authentication integration tests"
+        },
+        {
+          "id": "CRM-005-AC02",
+          "criterion": "Every role/action/scope combination has an automated allow-or-deny test, including cross-owner direct IDs and search results.",
+          "evidence": "Permission matrix test suite"
+        },
+        {
+          "id": "CRM-005-AC03",
+          "criterion": "View permission alone never grants bulk export, merge, import, reassignment, or catalog-management capability.",
+          "evidence": "Negative permission tests"
+        },
+        {
+          "id": "CRM-005-AC04",
+          "criterion": "Temporary elevation expires automatically and every use records actor, reason, scope, approval, and timestamp.",
+          "evidence": "Expiry and audit integration tests"
+        },
+        {
+          "id": "CRM-005-AC05",
+          "criterion": "No UI navigation item or server endpoint exposes an unauthorized function or out-of-scope record.",
+          "evidence": "Navigation and endpoint authorization tests"
+        }
+      ],
+      "out_of_scope": [
+        "Building a new enterprise identity provider",
+        "Shared user accounts"
+      ]
+    },
+    {
+      "id": "CRM-006",
+      "title": "Parties, organizations, people, and contact points",
+      "phase": "Core CRM",
+      "priority": "P0",
+      "status": "done",
+      "status_history": [
+        "pending",
+        "in_progress",
+        "review",
+        "done"
+      ],
+      "task_envelope": "progress/tasks/CRM-006.json",
+      "implementation_report": "progress/impl_CRM-006.md",
+      "validation_report": "progress/validation_CRM-006.md",
+      "depends_on": [
+        "CRM-004",
+        "CRM-005"
+      ],
+      "user_story": "As a seller, I need a single understandable record for each organization or person and reliable ways to contact them.",
+      "requirements": [
+        {
+          "id": "CRM-006-R01",
+          "statement": "Model a party as exactly one person or organization subtype and support explicit person-to-organization relationships with role and effective dates."
+        },
+        {
+          "id": "CRM-006-R02",
+          "statement": "Store one atomic contact value per contact point with type, raw value, normalized value, verification state, active state, suppression state, and provenance."
+        },
+        {
+          "id": "CRM-006-R03",
+          "statement": "Normalize email case and phone numbers to E.164 when possible while retaining the original evidence."
+        },
+        {
+          "id": "CRM-006-R04",
+          "statement": "Support specialties, addresses, province/locality, aliases, websites, and generic organizational contact points without misclassifying them as personal identifiers."
+        },
+        {
+          "id": "CRM-006-R05",
+          "statement": "Use lifecycle state and optimistic concurrency so archive and concurrent edits are explicit and recoverable."
+        },
+        {
+          "id": "CRM-006-R06",
+          "statement": "Warn on exact email or phone matches and plausible name/organization matches before creating a party, but never perform an automatic fuzzy merge."
+        }
+      ],
+      "acceptance": [
+        {
+          "id": "CRM-006-AC01",
+          "criterion": "Database constraints prevent a party from having both or neither subtype and prevent invalid relationship references.",
+          "evidence": "PostgreSQL constraint tests"
+        },
+        {
+          "id": "CRM-006-AC02",
+          "criterion": "Valid emails and phone numbers normalize deterministically while invalid or incomplete values retain raw evidence and receive an explicit quality state.",
+          "evidence": "Normalization unit tests with workbook-derived examples"
+        },
+        {
+          "id": "CRM-006-AC03",
+          "criterion": "Suppressed contact points cannot be selected for outreach and remain suppressed after edits, imports, and merges.",
+          "evidence": "Domain and integration tests"
+        },
+        {
+          "id": "CRM-006-AC04",
+          "criterion": "A stale edit receives a readable conflict response and cannot silently overwrite the newer record.",
+          "evidence": "Concurrent-update integration test"
+        },
+        {
+          "id": "CRM-006-AC05",
+          "criterion": "Archiving a party preserves its source evidence and historical relationships and removes it from default active lists.",
+          "evidence": "Lifecycle and query tests"
+        }
+      ],
+      "out_of_scope": [
+        "Automatic fuzzy merging",
+        "Patient or clinical identities"
+      ]
+    },
+    {
+      "id": "CRM-007",
+      "title": "Lead lifecycle, ownership, and stage history",
+      "phase": "Core CRM",
+      "priority": "P0",
+      "status": "done",
+      "status_history": [
+        "pending",
+        "in_progress",
+        "review",
+        "done"
+      ],
+      "task_envelope": "progress/tasks/CRM-007.json",
+      "implementation_report": "progress/impl_CRM-007.md",
+      "validation_report": "progress/validation_CRM-007.md",
+      "depends_on": [
+        "CRM-004",
+        "CRM-005",
+        "CRM-006"
+      ],
+      "user_story": "As a sales representative, I need to own and advance leads through a clear pipeline without losing history or accountability.",
+      "requirements": [
+        {
+          "id": "CRM-007-R01",
+          "statement": "Model leads separately from parties and link people or organizations to leads using explicit roles."
+        },
+        {
+          "id": "CRM-007-R02",
+          "statement": "Support campaign, current stage, data-readiness state, source attribution, created date, archive state, and a human-readable lead number."
+        },
+        {
+          "id": "CRM-007-R03",
+          "statement": "Maintain append-only stage history with occurred time, actor, reason, and required stage-specific fields."
+        },
+        {
+          "id": "CRM-007-R04",
+          "statement": "Maintain assignment history and enforce no more than one active primary owner while allowing configured team visibility."
+        },
+        {
+          "id": "CRM-007-R05",
+          "statement": "Require open in-progress leads to have a valid next task or an explicit documented reason according to policy."
+        },
+        {
+          "id": "CRM-007-R06",
+          "statement": "Use optimistic concurrency and atomic services for stage changes, reassignment, and related audit events."
+        }
+      ],
+      "acceptance": [
+        {
+          "id": "CRM-007-AC01",
+          "criterion": "The lead current stage always equals the most recent accepted stage-history entry.",
+          "evidence": "Service and database invariant tests"
+        },
+        {
+          "id": "CRM-007-AC02",
+          "criterion": "Invalid stage transitions or missing required reasons and fields are rejected without partial writes.",
+          "evidence": "Transition matrix and transaction tests"
+        },
+        {
+          "id": "CRM-007-AC03",
+          "criterion": "The database prevents two active primary owners for one lead and preserves previous assignments.",
+          "evidence": "PostgreSQL partial-uniqueness tests"
+        },
+        {
+          "id": "CRM-007-AC04",
+          "criterion": "A seller cannot update, reassign, or transition an out-of-scope lead by changing a URL or request body.",
+          "evidence": "Permission and object-scope tests"
+        },
+        {
+          "id": "CRM-007-AC05",
+          "criterion": "Lead creation warns about existing party and lead candidates and creates the lead, party links, owner, source, and next task atomically.",
+          "evidence": "End-to-end creation test"
+        }
+      ],
+      "out_of_scope": [
+        "Revenue forecasting",
+        "Quotes and contracts"
+      ]
+    },
+    {
+      "id": "CRM-008",
+      "title": "Interactions, tasks, and lead timeline",
+      "phase": "Core CRM",
+      "priority": "P0",
+      "status": "done",
+      "status_history": [
+        "pending",
+        "in_progress",
+        "review",
+        "done"
+      ],
+      "task_envelope": "progress/tasks/CRM-008.json",
+      "implementation_report": "progress/impl_CRM-008.md",
+      "validation_report": "progress/validation_CRM-008.md",
+      "depends_on": [
+        "CRM-006",
+        "CRM-007"
+      ],
+      "user_story": "As a seller, I need to log a contact and its next step quickly so the team always knows what happened and what comes next.",
+      "requirements": [
+        {
+          "id": "CRM-008-R01",
+          "statement": "Record interactions with one lead, occurrence date and optional exact time, direction, channel, outcome, participants, note, actor, and source."
+        },
+        {
+          "id": "CRM-008-R02",
+          "statement": "Reject placeholders such as Sin accion as interactions and distinguish attempted contact, completed contact, and response using governed outcome semantics."
+        },
+        {
+          "id": "CRM-008-R03",
+          "statement": "Support tasks with owner, due date, state, priority, completion/reschedule details, and optional link to the originating interaction."
+        },
+        {
+          "id": "CRM-008-R04",
+          "statement": "Create interaction, optional stage update, next task, and audit event in one database transaction."
+        },
+        {
+          "id": "CRM-008-R05",
+          "statement": "Present an ordered lead timeline that distinguishes occurrence time from entry time and includes stage and assignment history."
+        },
+        {
+          "id": "CRM-008-R06",
+          "statement": "Retain date-only precision when the source does not justify an exact time."
+        }
+      ],
+      "acceptance": [
+        {
+          "id": "CRM-008-AC01",
+          "criterion": "The quick-contact workflow validates lead, date, channel, and outcome and saves its interaction, next task, and audit event atomically.",
+          "evidence": "Transaction integration tests"
+        },
+        {
+          "id": "CRM-008-AC02",
+          "criterion": "Sin accion and equivalent non-events cannot create interaction rows or inflate contact metrics.",
+          "evidence": "Domain and reporting regression tests"
+        },
+        {
+          "id": "CRM-008-AC03",
+          "criterion": "Task state and dates remain consistent: completion requires completion time, open tasks have no completion time, and overdue uses the team-local date.",
+          "evidence": "Database and timezone tests"
+        },
+        {
+          "id": "CRM-008-AC04",
+          "criterion": "The timeline is stable, correctly ordered, permission-scoped, and labels source versus user-entered events.",
+          "evidence": "Query and template integration tests"
+        },
+        {
+          "id": "CRM-008-AC05",
+          "criterion": "Representative sellers can complete the quick-contact workflow in under 60 seconds without technical assistance.",
+          "evidence": "Documented moderated usability test"
+        }
+      ],
+      "out_of_scope": [
+        "Call recording",
+        "Email inbox synchronization"
+      ]
+    },
+    {
+      "id": "CRM-009",
+      "title": "Today workspace and guided CRM navigation",
+      "phase": "Core CRM",
+      "priority": "P0",
+      "status": "done",
+      "status_history": [
+        "pending",
+        "in_progress",
+        "review",
+        "done"
+      ],
+      "task_envelope": "progress/tasks/CRM-009.json",
+      "implementation_report": "progress/impl_CRM-009.md",
+      "validation_report": "progress/validation_CRM-009.md",
+      "depends_on": [
+        "CRM-007",
+        "CRM-008"
+      ],
+      "user_story": "As a non-technical seller, I need the application to tell me what needs attention without constructing a query or understanding the database.",
+      "requirements": [
+        {
+          "id": "CRM-009-R01",
+          "statement": "Provide top-level Today, My leads, Search, Reports, Data quality when authorized, and Help navigation."
+        },
+        {
+          "id": "CRM-009-R02",
+          "statement": "Today shows overdue tasks, tasks due today, stale in-progress leads, new responses, and unassigned items visible to managers."
+        },
+        {
+          "id": "CRM-009-R03",
+          "statement": "Order Today items by transparent urgency rules and let every item open the relevant lead or task."
+        },
+        {
+          "id": "CRM-009-R04",
+          "statement": "The lead detail page combines identity, contacts, stage, owner, source summary, quality flags, timeline, and next task without exposing database terminology."
+        },
+        {
+          "id": "CRM-009-R05",
+          "statement": "Provide useful empty states and one-click common actions with safe defaults for current user, current lead, date, and recent channel."
+        }
+      ],
+      "acceptance": [
+        {
+          "id": "CRM-009-AC01",
+          "criterion": "A seller opening the application sees only their actionable, scope-authorized work without first configuring filters.",
+          "evidence": "Role-based Today integration tests"
+        },
+        {
+          "id": "CRM-009-AC02",
+          "criterion": "Overdue, due-today, stale, response, and unassigned classifications match fixed timezone-aware fixtures.",
+          "evidence": "Domain and query tests"
+        },
+        {
+          "id": "CRM-009-AC03",
+          "criterion": "Every card and row has a clear next action, a readable empty state, and a direct path to its lead or task.",
+          "evidence": "Template tests and manual UX review"
+        },
+        {
+          "id": "CRM-009-AC04",
+          "criterion": "The main navigation and lead page use plain Spanish labels and expose no table names, foreign keys, SQL vocabulary, or raw UUIDs.",
+          "evidence": "UI content review and rendered-page tests"
+        }
+      ],
+      "out_of_scope": [
+        "User-programmable dashboards",
+        "Gamification"
+      ]
+    },
+    {
+      "id": "CRM-010",
+      "title": "Lossless spreadsheet import, staging, and lineage",
+      "phase": "Data quality",
+      "priority": "P0",
+      "status": "done",
+      "status_history": [
+        "pending",
+        "in_progress",
+        "review",
+        "done"
+      ],
+      "task_envelope": "progress/tasks/CRM-010.json",
+      "implementation_report": "progress/impl_CRM-010.md",
+      "validation_report": "progress/validation_CRM-010.md",
+      "depends_on": [
+        "CRM-006",
+        "CRM-007"
+      ],
+      "user_story": "As a data steward, I need to preview and reconcile an import before it changes canonical records while preserving every source row.",
+      "requirements": [
+        {
+          "id": "CRM-010-R01",
+          "statement": "Model source documents, import batches, source records, source coordinates, raw row payloads, checksums, parser version, status, and import actor."
+        },
+        {
+          "id": "CRM-010-R02",
+          "statement": "Separate upload, staging, validation, candidate matching, approval, canonical application, and reconciliation into explicit states."
+        },
+        {
+          "id": "CRM-010-R03",
+          "statement": "Preview row counts, errors, warnings, inferred changes, duplicates, unmatched activities, and canonical diffs before approval."
+        },
+        {
+          "id": "CRM-010-R04",
+          "statement": "Make reruns idempotent by source checksum, source-row identity, deterministic normalization rules, and application version."
+        },
+        {
+          "id": "CRM-010-R05",
+          "statement": "Require steward approval before canonical writes and apply each approved batch atomically or with a documented resumable transaction boundary."
+        },
+        {
+          "id": "CRM-010-R06",
+          "statement": "Retain source-to-canonical links for parties, leads, contacts, interactions, tasks, aliases, and corrections."
+        }
+      ],
+      "acceptance": [
+        {
+          "id": "CRM-010-AC01",
+          "criterion": "Uploading a workbook creates staging and preview records but causes no canonical business-data change before explicit approval.",
+          "evidence": "Import-state integration test"
+        },
+        {
+          "id": "CRM-010-AC02",
+          "criterion": "Reprocessing the same checksum and parser version creates no duplicate canonical entities, contacts, leads, or interactions.",
+          "evidence": "Idempotency test"
+        },
+        {
+          "id": "CRM-010-AC03",
+          "criterion": "Every staged row retains workbook, sheet, row coordinate, raw values, classification, and resulting canonical links or rejection reason.",
+          "evidence": "Lineage reconciliation test"
+        },
+        {
+          "id": "CRM-010-AC04",
+          "criterion": "Malformed files, unexpected headers, formula errors, and oversized uploads fail safely with understandable Spanish diagnostics.",
+          "evidence": "Upload validation and security tests"
+        },
+        {
+          "id": "CRM-010-AC05",
+          "criterion": "Only a data steward can approve or apply an import, and approval and application are audited separately.",
+          "evidence": "Permission and audit tests"
+        }
+      ],
+      "out_of_scope": [
+        "Direct database editing during migration",
+        "Unapproved automatic correction of ambiguous source data"
+      ]
+    },
+    {
+      "id": "CRM-011",
+      "title": "Data-quality queue, matching, and governed merge",
+      "phase": "Data quality",
+      "priority": "P0",
+      "status": "done",
+      "status_history": [
+        "pending",
+        "in_progress",
+        "review",
+        "done"
+      ],
+      "task_envelope": "progress/tasks/CRM-011.json",
+      "implementation_report": "progress/impl_CRM-011.md",
+      "validation_report": "progress/validation_CRM-011.md",
+      "depends_on": [
+        "CRM-006",
+        "CRM-007",
+        "CRM-010"
+      ],
+      "user_story": "As a data steward, I need a prioritized evidence-based queue to correct invalid data and merge duplicates without losing provenance.",
+      "requirements": [
+        {
+          "id": "CRM-011-R01",
+          "statement": "Model quality issues with rule code, severity, affected source and canonical records, owner, state, decision, timestamps, and acceptance reason."
+        },
+        {
+          "id": "CRM-011-R02",
+          "statement": "Generate deterministic exact candidates for normalized email, phone, and approved source identifiers and evidence-ranked fuzzy candidates for names and organizations."
+        },
+        {
+          "id": "CRM-011-R03",
+          "statement": "Never auto-merge fuzzy candidates; present a side-by-side comparison, source evidence, confidence reasons, and affected links."
+        },
+        {
+          "id": "CRM-011-R04",
+          "statement": "Merge through an atomic service that selects a survivor, preserves aliases and source links, redirects related records, respects suppression, and records chosen values."
+        },
+        {
+          "id": "CRM-011-R05",
+          "statement": "Support split or reject decisions and retain rejected candidate decisions so the same pair is not repeatedly proposed without new evidence."
+        },
+        {
+          "id": "CRM-011-R06",
+          "statement": "Show data-readiness and high-severity quality indicators to authorized users without overwhelming the normal seller workflow."
+        }
+      ],
+      "acceptance": [
+        {
+          "id": "CRM-011-AC01",
+          "criterion": "Error, warning, and information issues sort predictably by severity and age and can be assigned, resolved, accepted with reason, or reopened.",
+          "evidence": "Queue and state-machine tests"
+        },
+        {
+          "id": "CRM-011-AC02",
+          "criterion": "Fuzzy similarity can only create a review candidate and never changes canonical relationships without steward approval.",
+          "evidence": "Negative mutation and matching tests"
+        },
+        {
+          "id": "CRM-011-AC03",
+          "criterion": "A merge preview lists every lead, interaction, task, contact point, alias, and source link that will be affected.",
+          "evidence": "Fixture-backed preview test"
+        },
+        {
+          "id": "CRM-011-AC04",
+          "criterion": "After an approved merge, old identifiers resolve to the survivor, provenance remains traceable, and suppressed contact points remain suppressed.",
+          "evidence": "Merge invariant integration tests"
+        },
+        {
+          "id": "CRM-011-AC05",
+          "criterion": "Every merge, rejection, split, correction, and accepted warning records actor, reason, before state, after state, and source evidence.",
+          "evidence": "Audit-event tests"
+        }
+      ],
+      "out_of_scope": [
+        "Fully automatic fuzzy entity resolution",
+        "Destructive deletion of merged source evidence"
+      ]
+    },
+    {
+      "id": "CRM-012",
+      "title": "Permission-scoped global search",
+      "phase": "Query and reporting",
+      "priority": "P0",
+      "status": "done",
+      "status_history": [
+        "pending",
+        "in_progress",
+        "review",
+        "done"
+      ],
+      "task_envelope": "progress/tasks/CRM-012.json",
+      "implementation_report": "progress/impl_CRM-012.md",
+      "validation_report": "progress/validation_CRM-012.md",
+      "depends_on": [
+        "CRM-006",
+        "CRM-007",
+        "CRM-008"
+      ],
+      "user_story": "As a seller, I need to find a prospect using a name, organization, email, phone, or note even when accents or a minor spelling error differ.",
+      "requirements": [
+        {
+          "id": "CRM-012-R01",
+          "statement": "Search parties, organizations, people, aliases, leads, normalized email and phone, and authorized notes through one understandable search box."
+        },
+        {
+          "id": "CRM-012-R02",
+          "statement": "Combine exact identifier matching, normalized text, PostgreSQL full-text search, and pg_trgm similarity with deterministic ranking."
+        },
+        {
+          "id": "CRM-012-R03",
+          "statement": "Apply row scope before ranking and pagination so result counts and snippets never leak unauthorized information."
+        },
+        {
+          "id": "CRM-012-R04",
+          "statement": "Display why a result matched and enough identity context to distinguish similar parties without exposing sensitive details."
+        },
+        {
+          "id": "CRM-012-R05",
+          "statement": "Use indexed queries, bounded input, stable pagination, and observable slow-query thresholds."
+        }
+      ],
+      "acceptance": [
+        {
+          "id": "CRM-012-AC01",
+          "criterion": "Fixed fixtures are found by exact email, normalized phone, accented and unaccented names, organization alias, and one-character spelling variation.",
+          "evidence": "PostgreSQL search integration tests"
+        },
+        {
+          "id": "CRM-012-AC02",
+          "criterion": "Out-of-scope records affect neither returned rows, counts, ranking, suggestions, nor highlighted snippets.",
+          "evidence": "Cross-scope leakage tests"
+        },
+        {
+          "id": "CRM-012-AC03",
+          "criterion": "Every result identifies its match reason and opens the correct permission-checked record.",
+          "evidence": "Template and endpoint tests"
+        },
+        {
+          "id": "CRM-012-AC04",
+          "criterion": "Representative search requests meet the agreed 500 millisecond p95 server-response target at the initial-volume test dataset.",
+          "evidence": "Recorded performance test and query plans"
+        },
+        {
+          "id": "CRM-012-AC05",
+          "criterion": "Empty, excessively long, wildcard-heavy, and malformed search input is handled safely without unbounded queries.",
+          "evidence": "Input-boundary and abuse tests"
+        }
+      ],
+      "out_of_scope": [
+        "Elasticsearch or OpenSearch",
+        "Automatic merging from search similarity"
+      ]
+    },
+    {
+      "id": "CRM-013",
+      "title": "Guided filters, segments, and saved views",
+      "phase": "Query and reporting",
+      "priority": "P0",
+      "status": "done",
+      "status_history": [
+        "pending",
+        "in_progress",
+        "review",
+        "done"
+      ],
+      "task_envelope": "progress/tasks/CRM-013.json",
+      "implementation_report": "progress/impl_CRM-013.md",
+      "validation_report": "progress/validation_CRM-013.md",
+      "depends_on": [
+        "CRM-009",
+        "CRM-012"
+      ],
+      "user_story": "As a non-technical user, I need to build and save meaningful segments using business language instead of SQL.",
+      "requirements": [
+        {
+          "id": "CRM-013-R01",
+          "statement": "Provide allow-listed filters for lead stage, owner, campaign, readiness, source, age, staleness, geography, specialty, contactability, activity, response, and task state."
+        },
+        {
+          "id": "CRM-013-R02",
+          "statement": "Support guided AND conditions and deliberately bounded OR groups without accepting column names, SQL fragments, or arbitrary expressions."
+        },
+        {
+          "id": "CRM-013-R03",
+          "statement": "Always display a human-readable Spanish summary, result count, sort order, active filters, and easy reset controls."
+        },
+        {
+          "id": "CRM-013-R04",
+          "statement": "Support private views and manager-approved shared views using versioned structured definitions rather than stored SQL."
+        },
+        {
+          "id": "CRM-013-R05",
+          "statement": "Apply the same authorization scope to counts, results, saved-view execution, and subsequent exports."
+        }
+      ],
+      "acceptance": [
+        {
+          "id": "CRM-013-AC01",
+          "criterion": "Each supported filter and operator maps to a validated typed value and a deterministic ORM query.",
+          "evidence": "Parameterized filter tests"
+        },
+        {
+          "id": "CRM-013-AC02",
+          "criterion": "A saved view can be created, reopened, renamed, copied, archived, and executed without changing its meaning.",
+          "evidence": "Saved-view lifecycle tests"
+        },
+        {
+          "id": "CRM-013-AC03",
+          "criterion": "A user cannot execute another user private view or gain broader access through a manager shared view.",
+          "evidence": "Permission and tampering tests"
+        },
+        {
+          "id": "CRM-013-AC04",
+          "criterion": "Pagination and sorting are stable and do not duplicate or omit records when several rows share the selected sort value.",
+          "evidence": "Pagination regression tests"
+        },
+        {
+          "id": "CRM-013-AC05",
+          "criterion": "Rendered filters use business labels and never expose database table names, raw field paths, or SQL syntax.",
+          "evidence": "Rendered content tests"
+        }
+      ],
+      "out_of_scope": [
+        "Arbitrary SQL query entry",
+        "Natural-language query generation"
+      ]
+    },
+    {
+      "id": "CRM-014",
+      "title": "Metric catalog, dashboards, and governed reports",
+      "phase": "Query and reporting",
+      "priority": "P0",
+      "status": "done",
+      "status_history": [
+        "pending",
+        "in_progress",
+        "review",
+        "done"
+      ],
+      "task_envelope": "progress/tasks/CRM-014.json",
+      "implementation_report": "progress/impl_CRM-014.md",
+      "validation_report": "progress/validation_CRM-014.md",
+      "depends_on": [
+        "CRM-007",
+        "CRM-008",
+        "CRM-013"
+      ],
+      "user_story": "As a sales manager, I need reports with consistent definitions so I can trust pipeline, activity, response, source, follow-up, and data-quality decisions.",
+      "requirements": [
+        {
+          "id": "CRM-014-R01",
+          "statement": "Create governed definitions for contactable lead, contacted lead, response rate, stale lead, stage age, overdue task, and cohort conversion."
+        },
+        {
+          "id": "CRM-014-R02",
+          "statement": "Every metric records owner, description, numerator, denominator, inclusion rules, timeframe semantics, version, and effective date."
+        },
+        {
+          "id": "CRM-014-R03",
+          "statement": "Provide approved reports for attention today, pipeline distribution, contact activity, response, source performance, follow-up gaps, research needs, and time in stage."
+        },
+        {
+          "id": "CRM-014-R04",
+          "statement": "Use read-only reporting services or database views that preserve authorization scope and isolate metric semantics from templates."
+        },
+        {
+          "id": "CRM-014-R05",
+          "statement": "Show definition, selected timeframe, scope, filters, as-of timestamp, result count, and data-freshness indicator with each report."
+        },
+        {
+          "id": "CRM-014-R06",
+          "statement": "Use stage history for stage age and conversion, interaction occurrence for contact metrics, and team-local dates for overdue work."
+        }
+      ],
+      "acceptance": [
+        {
+          "id": "CRM-014-AC01",
+          "criterion": "Fixture datasets with known outcomes produce the approved value for every metric and report dimension.",
+          "evidence": "Fixture-backed reporting test suite"
+        },
+        {
+          "id": "CRM-014-AC02",
+          "criterion": "Sin accion rows are excluded from contact and response measures, and response rate uses eligible outbound interactions rather than lead count.",
+          "evidence": "Metric regression tests"
+        },
+        {
+          "id": "CRM-014-AC03",
+          "criterion": "Report rows, totals, and chart categories remain within the requesting user's authorized scope.",
+          "evidence": "Cross-scope reporting tests"
+        },
+        {
+          "id": "CRM-014-AC04",
+          "criterion": "Every displayed KPI exposes its versioned definition, timeframe, scope, owner, and as-of time from the same page.",
+          "evidence": "Rendered dashboard tests"
+        },
+        {
+          "id": "CRM-014-AC05",
+          "criterion": "Standard dashboards meet the agreed 2 second p95 response target at the initial-volume test dataset.",
+          "evidence": "Performance test and database query plans"
+        }
+      ],
+      "out_of_scope": [
+        "Cross-system data warehouse",
+        "User-authored SQL metrics"
+      ]
+    },
+    {
+      "id": "CRM-015",
+      "title": "Governed exports",
+      "phase": "Query and reporting",
+      "priority": "P1",
+      "status": "done",
+      "status_history": [
+        "pending",
+        "in_progress",
+        "review",
+        "done"
+      ],
+      "task_envelope": "progress/tasks/CRM-015.json",
+      "implementation_report": "progress/impl_CRM-015.md",
+      "validation_report": "progress/validation_CRM-015.md",
+      "depends_on": [
+        "CRM-005",
+        "CRM-013",
+        "CRM-014"
+      ],
+      "user_story": "As an authorized user, I need to export a defined result set without bypassing scope, privacy, or audit controls.",
+      "requirements": [
+        {
+          "id": "CRM-015-R01",
+          "statement": "Require a separate export permission and reapply row and field scope at export execution time."
+        },
+        {
+          "id": "CRM-015-R02",
+          "statement": "Support approved CSV and XLSX layouts with explicit column definitions, localized dates, stable codes when required, and no hidden sensitive fields."
+        },
+        {
+          "id": "CRM-015-R03",
+          "statement": "Run large exports as bounded background jobs with status, expiry, retry policy, and access-controlled download."
+        },
+        {
+          "id": "CRM-015-R04",
+          "statement": "Record requester, reason when required, report or saved-view definition, filters, scope, row count, fields, file checksum, and download events."
+        },
+        {
+          "id": "CRM-015-R05",
+          "statement": "Protect spreadsheet exports against formula injection and use predictable UTF-8 and date representations."
+        }
+      ],
+      "acceptance": [
+        {
+          "id": "CRM-015-AC01",
+          "criterion": "A user with view access but without export permission cannot create, inspect, or download an export through any endpoint.",
+          "evidence": "Authorization tests"
+        },
+        {
+          "id": "CRM-015-AC02",
+          "criterion": "Changing a saved view after requesting an export does not change the captured export definition, and scope is re-evaluated before file creation.",
+          "evidence": "Snapshot and scope integration tests"
+        },
+        {
+          "id": "CRM-015-AC03",
+          "criterion": "CSV and XLSX cells beginning with formula-control characters are neutralized without corrupting legitimate data.",
+          "evidence": "Formula-injection test vectors"
+        },
+        {
+          "id": "CRM-015-AC04",
+          "criterion": "Expired, deleted, or unauthorized export downloads are unavailable while their audit metadata remains retained according to policy.",
+          "evidence": "Expiry and access tests"
+        },
+        {
+          "id": "CRM-015-AC05",
+          "criterion": "Every successful and denied export attempt produces the appropriate audit event without logging file contents.",
+          "evidence": "Audit integration tests"
+        }
+      ],
+      "out_of_scope": [
+        "Public sharing links",
+        "Unlimited synchronous exports"
+      ]
+    },
+    {
+      "id": "CRM-016",
+      "title": "Audit, privacy, retention, and governed correction",
+      "phase": "Trust and governance",
+      "priority": "P0",
+      "status": "done",
+      "status_history": [
+        "pending",
+        "in_progress",
+        "review",
+        "done"
+      ],
+      "task_envelope": "progress/tasks/CRM-016.json",
+      "implementation_report": "progress/impl_CRM-016.md",
+      "validation_report": "progress/validation_CRM-016.md",
+      "depends_on": [
+        "CRM-005",
+        "CRM-006",
+        "CRM-007",
+        "CRM-010",
+        "CRM-011",
+        "CRM-015"
+      ],
+      "user_story": "As a privacy or audit reviewer, I need to trace sensitive actions and complete access, correction, suppression, and retention workflows consistently.",
+      "requirements": [
+        {
+          "id": "CRM-016-R01",
+          "statement": "Maintain append-only business audit events for authentication, authorization decisions, sensitive reads when required, creates, updates, stage changes, assignments, imports, merges, suppression, exports, and administration."
+        },
+        {
+          "id": "CRM-016-R02",
+          "statement": "Audit events record actor, action, target, request correlation, reason, timestamp, and safe before/after changes without duplicating secrets or unrestricted note bodies."
+        },
+        {
+          "id": "CRM-016-R03",
+          "statement": "Provide a permissioned workflow to locate all related personal data and record access, correction, update, suppression, and deletion-or-retention decisions."
+        },
+        {
+          "id": "CRM-016-R04",
+          "statement": "Enforce contact suppression across manual outreach, reminders, imports, merges, reports, and exports."
+        },
+        {
+          "id": "CRM-016-R05",
+          "statement": "Implement approved retention categories and legal-hold exceptions using reviewable jobs rather than silent destructive deletion."
+        },
+        {
+          "id": "CRM-016-R06",
+          "statement": "Display policy guidance that prohibits patient or clinical data and provide an incident path for inappropriate sensitive content."
+        }
+      ],
+      "acceptance": [
+        {
+          "id": "CRM-016-AC01",
+          "criterion": "Audit events are immutable to normal application and administrator roles and can be filtered only by authorized reviewers.",
+          "evidence": "Database permissions and application authorization tests"
+        },
+        {
+          "id": "CRM-016-AC02",
+          "criterion": "A privacy reviewer can locate a person's parties, contact points, lead relationships, source lineage, interactions, exports, and suppression state from one governed workflow.",
+          "evidence": "Privacy-workflow end-to-end test"
+        },
+        {
+          "id": "CRM-016-AC03",
+          "criterion": "A suppressed contact point cannot reappear as contactable after a repeat import, party merge, reactivation, or saved-view execution.",
+          "evidence": "Cross-feature suppression regression tests"
+        },
+        {
+          "id": "CRM-016-AC04",
+          "criterion": "Retention dry runs enumerate intended actions and require approved execution; legal-hold records are excluded and explained.",
+          "evidence": "Retention preview and execution tests"
+        },
+        {
+          "id": "CRM-016-AC05",
+          "criterion": "Application logs and audit events contain no passwords, tokens, database URLs, complete export contents, or unrestricted sensitive notes.",
+          "evidence": "Automated log-redaction tests and manual sample review"
+        }
+      ],
+      "out_of_scope": [
+        "Providing legal advice",
+        "Clinical-record retention"
+      ]
+    },
+    {
+      "id": "CRM-017",
+      "title": "Transactional jobs, reminders, and notifications",
+      "phase": "Platform",
+      "priority": "P1",
+      "status": "done",
+      "status_history": [
+        "pending",
+        "in_progress",
+        "review",
+        "done"
+      ],
+      "task_envelope": "progress/tasks/CRM-017.json",
+      "implementation_report": "progress/impl_CRM-017.md",
+      "validation_report": "progress/validation_CRM-017.md",
+      "depends_on": [
+        "CRM-003",
+        "CRM-008"
+      ],
+      "user_story": "As a seller, I need dependable reminders without receiving duplicate or excessive notifications.",
+      "requirements": [
+        {
+          "id": "CRM-017-R01",
+          "statement": "Implement a PostgreSQL transactional outbox with job type, payload reference, idempotency key, schedule, attempts, state, lease, and last safe error."
+        },
+        {
+          "id": "CRM-017-R02",
+          "statement": "Run a separately deployable worker process using bounded polling, transaction-safe claiming, retry with backoff, and dead-letter review."
+        },
+        {
+          "id": "CRM-017-R03",
+          "statement": "Create reminder jobs in the same transaction as task changes so committed work is eventually notified and rolled-back work is not."
+        },
+        {
+          "id": "CRM-017-R04",
+          "statement": "Provide per-user notification preferences with digest by default and restricted escalation rules."
+        },
+        {
+          "id": "CRM-017-R05",
+          "statement": "Expose failed jobs and retries to authorized operators without exposing secrets or full personal-data payloads."
+        }
+      ],
+      "acceptance": [
+        {
+          "id": "CRM-017-AC01",
+          "criterion": "Repeated processing of the same idempotency key produces no duplicate reminder or export artifact.",
+          "evidence": "Worker idempotency tests"
+        },
+        {
+          "id": "CRM-017-AC02",
+          "criterion": "A worker crash after claiming or sending a job recovers according to the documented lease and provider-idempotency behavior.",
+          "evidence": "Failure-injection integration tests"
+        },
+        {
+          "id": "CRM-017-AC03",
+          "criterion": "Completing, cancelling, or rescheduling a task cancels or replaces obsolete reminders.",
+          "evidence": "Task/reminder lifecycle tests"
+        },
+        {
+          "id": "CRM-017-AC04",
+          "criterion": "Users receive the configured digest or escalation and can change permitted preferences from an accessible settings page.",
+          "evidence": "Notification preference and rendering tests"
+        },
+        {
+          "id": "CRM-017-AC05",
+          "criterion": "Operator job screens are permission-scoped and redact sensitive payload fields and provider credentials.",
+          "evidence": "Authorization and redaction tests"
+        }
+      ],
+      "out_of_scope": [
+        "Redis, RabbitMQ, or Celery before measured need",
+        "Mass-marketing notifications"
+      ]
+    },
+    {
+      "id": "CRM-018",
+      "title": "Spanish-first accessible and responsive experience",
+      "phase": "User experience",
+      "priority": "P0",
+      "status": "done",
+      "status_history": [
+        "pending",
+        "in_progress",
+        "review",
+        "done"
+      ],
+      "task_envelope": "progress/tasks/CRM-018.json",
+      "implementation_report": "progress/impl_CRM-018.md",
+      "validation_report": "progress/validation_CRM-018.md",
+      "depends_on": [
+        "CRM-009",
+        "CRM-011",
+        "CRM-012",
+        "CRM-013",
+        "CRM-014"
+      ],
+      "user_story": "As a non-technical user, I need every critical CRM workflow to be understandable, keyboard accessible, and usable on common desktop and phone screens.",
+      "requirements": [
+        {
+          "id": "CRM-018-R01",
+          "statement": "Target WCAG 2.2 AA for critical workflows with semantic HTML, visible focus, keyboard operation, sufficient contrast, status text, and accessible errors."
+        },
+        {
+          "id": "CRM-018-R02",
+          "statement": "Use plain Spanish business labels, visible field labels, examples, contextual help, and a maintained glossary; do not rely on placeholders alone."
+        },
+        {
+          "id": "CRM-018-R03",
+          "statement": "Use progressive disclosure so common fields appear first and technical lineage or research details remain available under clearly labeled detail sections."
+        },
+        {
+          "id": "CRM-018-R04",
+          "statement": "Ensure normal links and forms remain functional without HTMX; enhanced fragments must preserve focus, history, validation, and error recovery."
+        },
+        {
+          "id": "CRM-018-R05",
+          "statement": "Use responsive cards or controlled table overflow, 44-pixel-class touch targets, no drag-only interaction, and no meaning conveyed solely through color."
+        },
+        {
+          "id": "CRM-018-R06",
+          "statement": "Provide contextual Help and a one-page Como trabajamos guide for Today, leads, contact logging, search, and data-quality workflows."
+        }
+      ],
+      "acceptance": [
+        {
+          "id": "CRM-018-AC01",
+          "criterion": "Today to lead to log contact to create next task, search to saved view, and steward merge are usable using only the keyboard.",
+          "evidence": "Documented keyboard test and browser automation where practical"
+        },
+        {
+          "id": "CRM-018-AC02",
+          "criterion": "Automated accessibility checks report no serious or critical violation on every critical page and state.",
+          "evidence": "Accessibility scan artifacts"
+        },
+        {
+          "id": "CRM-018-AC03",
+          "criterion": "Critical pages remain understandable and operable at 200 percent zoom and at the agreed phone viewport without hidden required actions.",
+          "evidence": "Responsive manual test record and screenshots"
+        },
+        {
+          "id": "CRM-018-AC04",
+          "criterion": "Disabling JavaScript still allows authentication fallback, navigation, search, data display, and ordinary create/edit form submission.",
+          "evidence": "No-JavaScript browser test"
+        },
+        {
+          "id": "CRM-018-AC05",
+          "criterion": "Form errors retain user input, identify the affected field in text, move focus appropriately, and explain how to correct the value in Spanish.",
+          "evidence": "Form-error integration and manual screen-reader tests"
+        }
+      ],
+      "out_of_scope": [
+        "Native mobile application",
+        "Offline synchronization"
+      ]
+    },
+    {
+      "id": "CRM-019",
+      "title": "Application security and defense in depth",
+      "phase": "Trust and governance",
+      "priority": "P0",
+      "status": "done",
+      "status_history": [
+        "pending",
+        "in_progress",
+        "review",
+        "changes_requested",
+        "in_progress",
+        "review",
+        "done"
+      ],
+      "task_envelope": "progress/tasks/CRM-019.json",
+      "implementation_report": "progress/impl_CRM-019.md",
+      "validation_report": "progress/validation_CRM-019.md",
+      "depends_on": [
+        "CRM-003",
+        "CRM-005",
+        "CRM-015",
+        "CRM-016",
+        "CRM-017"
+      ],
+      "user_story": "As the security owner, I need layered controls and executable evidence that sales and personal data cannot be accessed or changed outside policy.",
+      "requirements": [
+        {
+          "id": "CRM-019-R01",
+          "statement": "Require HTTPS, secure HttpOnly SameSite cookies, trusted proxy configuration, CSRF protection, clickjacking protection, HSTS after validation, and a restrictive content security policy."
+        },
+        {
+          "id": "CRM-019-R02",
+          "statement": "Use parameterized ORM queries, output escaping, validated redirects, bounded uploads, safe filenames, request-size limits, and rate limits for authentication, search, export, and import."
+        },
+        {
+          "id": "CRM-019-R03",
+          "statement": "Use least-privilege application, migration, reporting, backup, and operator roles and apply selective PostgreSQL row-level security where it provides defense in depth."
+        },
+        {
+          "id": "CRM-019-R04",
+          "statement": "Store secrets in the deployment secret facility, rotate them under a documented process, and never include them in source, logs, jobs, exports, or error pages."
+        },
+        {
+          "id": "CRM-019-R05",
+          "statement": "Run dependency vulnerability, static analysis, Django deployment, and security regression checks in CI and before release."
+        },
+        {
+          "id": "CRM-019-R06",
+          "statement": "Maintain a threat model and verification checklist aligned with the selected OWASP ASVS 5.0 level."
+        }
+      ],
+      "acceptance": [
+        {
+          "id": "CRM-019-AC01",
+          "criterion": "Automated tests reject CSRF bypass, horizontal and vertical authorization attempts, unsafe redirects, malicious uploads, and spreadsheet-formula payloads.",
+          "evidence": "Security regression suite"
+        },
+        {
+          "id": "CRM-019-AC02",
+          "criterion": "Production deployment checks pass and expected TLS, cookie, HSTS, framing, referrer, and content-security headers are present.",
+          "evidence": "Deployment check and HTTP header scan"
+        },
+        {
+          "id": "CRM-019-AC03",
+          "criterion": "Direct SQL under each database role demonstrates only the privileges documented for that role, including tested RLS behavior where enabled.",
+          "evidence": "PostgreSQL role and RLS tests"
+        },
+        {
+          "id": "CRM-019-AC04",
+          "criterion": "Dependency and static scans contain no unresolved critical or high issue without a written, approved exception and expiry.",
+          "evidence": "Versioned scan reports"
+        },
+        {
+          "id": "CRM-019-AC05",
+          "criterion": "Production-style error responses disclose no stack trace, secret, database detail, or unauthorized record existence.",
+          "evidence": "Error-handling and enumeration tests"
+        }
+      ],
+      "out_of_scope": [
+        "Replacing the corporate identity provider",
+        "Security through UI hiding alone"
+      ]
+    },
+    {
+      "id": "CRM-020",
+      "title": "Deployment, observability, backups, and recovery",
+      "phase": "Operations",
+      "priority": "P0",
+      "status": "changes_requested",
+      "status_history": [
+        "pending",
+        "in_progress",
+        "review",
+        "changes_requested",
+        "in_progress",
+        "review",
+        "changes_requested",
+        "in_progress",
+        "review",
+        "changes_requested"
+      ],
+      "task_envelope": "progress/tasks/CRM-020.json",
+      "implementation_report": "progress/impl_CRM-020.md",
+      "validation_report": "progress/validation_CRM-020.md",
+      "depends_on": [
+        "CRM-002",
+        "CRM-003",
+        "CRM-017",
+        "CRM-019"
+      ],
+      "user_story": "As the technical owner, I need repeatable deployment and observable recovery so the CRM remains reliable without depending on one person's memory.",
+      "requirements": [
+        {
+          "id": "CRM-020-R01",
+          "statement": "Build immutable container images for one web process type and one worker process type, using a production WSGI or ASGI server and non-root runtime user."
+        },
+        {
+          "id": "CRM-020-R02",
+          "statement": "Maintain separate development, test, staging, and production configuration and databases with controlled promotion and migration steps."
+        },
+        {
+          "id": "CRM-020-R03",
+          "statement": "Emit structured, correlated logs, metrics, and traces for web requests, database calls, jobs, imports, exports, authentication, and critical domain commands without sensitive payloads."
+        },
+        {
+          "id": "CRM-020-R04",
+          "statement": "Define service-level indicators and alerts for availability, latency, error rate, database saturation, job backlog, import failures, and backup freshness."
+        },
+        {
+          "id": "CRM-020-R05",
+          "statement": "Use managed PostgreSQL backups with point-in-time recovery, encrypted object storage for temporary artifacts, documented retention, and quarterly isolated restore drills."
+        },
+        {
+          "id": "CRM-020-R06",
+          "statement": "Provide deployment, rollback, migration, incident, restore, credential-rotation, and worker-recovery runbooks."
+        }
+      ],
+      "acceptance": [
+        {
+          "id": "CRM-020-AC01",
+          "criterion": "The same versioned image runs in staging and production with configuration supplied externally and no development server or embedded secret.",
+          "evidence": "Image inspection and staging deployment record"
+        },
+        {
+          "id": "CRM-020-AC02",
+          "criterion": "A deployment can run preflight checks, apply migrations safely, verify readiness, and roll back application code according to the runbook.",
+          "evidence": "Staging deployment rehearsal"
+        },
+        {
+          "id": "CRM-020-AC03",
+          "criterion": "An operator can trace a failed request or job using a correlation ID without viewing personal-data payloads.",
+          "evidence": "Observability walkthrough and redaction test"
+        },
+        {
+          "id": "CRM-020-AC04",
+          "criterion": "A backup is restored into an isolated environment and passes login, row-count, lineage, and representative report checks within approved RPO and RTO.",
+          "evidence": "Signed restore-drill report"
+        },
+        {
+          "id": "CRM-020-AC05",
+          "criterion": "Alerts fire and recover in controlled tests for web failure, database unavailability, stale backup, and excessive job backlog.",
+          "evidence": "Alert test record"
+        }
+      ],
+      "out_of_scope": [
+        "A specific cloud-provider commitment before approval",
+        "Microservice orchestration"
+      ]
+    },
+    {
+      "id": "CRM-021",
+      "title": "Workbook migration rehearsal, reconciliation, and cutover",
+      "phase": "Migration",
+      "priority": "P0",
+      "status": "pending",
+      "depends_on": [
+        "CRM-010",
+        "CRM-011",
+        "CRM-016",
+        "CRM-020"
+      ],
+      "user_story": "As the data owner, I need a repeatable migration that proves every workbook row and business record is accounted for before spreadsheet editing stops.",
+      "requirements": [
+        {
+          "id": "CRM-021-R01",
+          "statement": "Use the normalized workbook as the approved migration input while retaining the original workbook checksum and source coordinates as evidence."
+        },
+        {
+          "id": "CRM-021-R02",
+          "statement": "Reconcile all 633 source rows, the 331 lead baseline, the 313 party baseline, the 151 atomic contact-point baseline, and every documented canonical transformation or exclusion."
+        },
+        {
+          "id": "CRM-021-R03",
+          "statement": "Resolve all 28 error-level items and obtain an explicit decision for every remaining warning before production cutover."
+        },
+        {
+          "id": "CRM-021-R04",
+          "statement": "Confirm the lead and occurrence date for all 34 interaction candidates, including the 22 exact links, 4 ambiguous candidates, and 8 unmatched candidates."
+        },
+        {
+          "id": "CRM-021-R05",
+          "statement": "Perform empty-environment dry runs, owner worklist review, manager stage-count review, source-evidence review, and repeatable correction mapping before final import."
+        },
+        {
+          "id": "CRM-021-R06",
+          "statement": "Execute a controlled spreadsheet freeze, checksum, final import, acceptance-query gate, go-live decision, and rollback plan that can reopen the prior process if acceptance fails."
+        },
+        {
+          "id": "CRM-021-R07",
+          "statement": "Keep the source workbook read-only after cutover and operate a two-week hypercare queue before decommissioning spreadsheet editing."
+        }
+      ],
+      "acceptance": [
+        {
+          "id": "CRM-021-AC01",
+          "criterion": "The reconciliation report accounts for every source row as imported, intentionally excluded, duplicate evidence, shell/header, or rejected with an approved reason.",
+          "evidence": "Automated source-to-target reconciliation artifact"
+        },
+        {
+          "id": "CRM-021-AC02",
+          "criterion": "There are zero unresolved error-level quality issues and every warning has a resolution or named owner-approved acceptance reason.",
+          "evidence": "Quality-issue export signed by the data owner"
+        },
+        {
+          "id": "CRM-021-AC03",
+          "criterion": "All 34 interaction candidates have a confirmed lead/date decision and no accepted interaction is orphaned.",
+          "evidence": "Interaction reconciliation query and steward sign-off"
+        },
+        {
+          "id": "CRM-021-AC04",
+          "criterion": "Running the final migration twice against equivalent empty databases yields identical canonical business keys, counts, issue states, and report results.",
+          "evidence": "Repeatability comparison report"
+        },
+        {
+          "id": "CRM-021-AC05",
+          "criterion": "Sales owners validate assigned worklists, managers validate stage totals, and the data owner approves lineage and migration exceptions before cutover.",
+          "evidence": "Recorded UAT and migration sign-offs"
+        },
+        {
+          "id": "CRM-021-AC06",
+          "criterion": "A rehearsed rollback can discard the new production database safely and restore the previous sales process within the approved cutover window.",
+          "evidence": "Staging rollback rehearsal"
+        }
+      ],
+      "out_of_scope": [
+        "Untraceable manual production database corrections",
+        "Deleting the original workbook evidence"
+      ]
+    },
+    {
+      "id": "CRM-022",
+      "title": "System validation, UAT, training, and launch readiness",
+      "phase": "Launch",
+      "priority": "P0",
+      "status": "pending",
+      "depends_on": [
+        "CRM-009",
+        "CRM-012",
+        "CRM-013",
+        "CRM-014",
+        "CRM-015",
+        "CRM-018",
+        "CRM-019",
+        "CRM-020",
+        "CRM-021"
+      ],
+      "user_story": "As the product owner, I need independent evidence, trained users, and approved launch gates before the CRM becomes the system of record.",
+      "requirements": [
+        {
+          "id": "CRM-022-R01",
+          "statement": "Run unit, PostgreSQL constraint, integration, permission matrix, browser journey, migration, reporting, accessibility, security, performance, and recovery verification."
+        },
+        {
+          "id": "CRM-022-R02",
+          "statement": "Execute role-based UAT for Today, lead creation, contact logging, stage change, tasks, search, saved views, merge, import, reports, export, and privacy workflows."
+        },
+        {
+          "id": "CRM-022-R03",
+          "statement": "Train sales champions, sellers, managers, data stewards, privacy reviewers, and operators using role-specific Spanish material and a staging environment."
+        },
+        {
+          "id": "CRM-022-R04",
+          "statement": "Instrument adoption, activity freshness, task hygiene, contactability, quality, report trust, usability, reliability, and support demand without invasive employee surveillance."
+        },
+        {
+          "id": "CRM-022-R05",
+          "statement": "Require product, data, security/privacy, reporting, operations, and user-adoption sign-offs and record all accepted residual risks."
+        },
+        {
+          "id": "CRM-022-R06",
+          "statement": "Treat failed security tests, unresolved migration errors, incorrect permission scope, unreconciled reports, failed restore, inaccessible critical workflows, or missing runbooks as release blockers."
+        }
+      ],
+      "acceptance": [
+        {
+          "id": "CRM-022-AC01",
+          "criterion": "The full release verification suite passes against the release candidate and production-equivalent PostgreSQL configuration.",
+          "evidence": "Versioned release test report"
+        },
+        {
+          "id": "CRM-022-AC02",
+          "criterion": "Every critical UAT journey is completed by its intended role with no unresolved release-blocking finding.",
+          "evidence": "Signed role-based UAT record"
+        },
+        {
+          "id": "CRM-022-AC03",
+          "criterion": "The quick-contact median is below 60 seconds and representative users can start the day, find a lead, and understand the next action without technical assistance.",
+          "evidence": "Moderated usability results"
+        },
+        {
+          "id": "CRM-022-AC04",
+          "criterion": "All required product, data, metric, privacy/security, operations, migration, training, and go-live approvals are recorded with approver and date.",
+          "evidence": "Launch decision record"
+        },
+        {
+          "id": "CRM-022-AC05",
+          "criterion": "Hypercare ownership, severity definitions, support channel, escalation path, daily review schedule, and rollback authority are documented and staffed.",
+          "evidence": "Approved hypercare runbook and roster"
+        },
+        {
+          "id": "CRM-022-AC06",
+          "criterion": "No release blocker remains open and each accepted non-blocking risk has an owner, mitigation, expiry, and review date.",
+          "evidence": "Final risk and blocker register"
+        }
+      ],
+      "out_of_scope": [
+        "Post-launch phase-three AI querying",
+        "Features not represented by approved backlog changes"
+      ]
+    },
+    {
+      "id": "CRM-023",
+      "title": "Persistent role-specific agent model policy",
+      "phase": "Foundation",
+      "priority": "P0",
+      "status": "done",
+      "status_history": [
+        "pending",
+        "in_progress",
+        "review",
+        "done"
+      ],
+      "task_envelope": "progress/tasks/CRM-023.json",
+      "implementation_report": "progress/impl_CRM-023.md",
+      "validation_report": "progress/validation_CRM-023.md",
+      "depends_on": [
+        "CRM-001"
+      ],
+      "user_story": "As the workflow owner, I need every delegated role to use a persisted and verifiable model and reasoning policy rather than inheriting an opaque session default.",
+      "requirements": [
+        {
+          "id": "CRM-023-R01",
+          "statement": "Persist the supported model catalog and default model/reasoning assignment for orchestrator, implementer, validator, and explorer roles in harness metadata."
+        },
+        {
+          "id": "CRM-023-R02",
+          "statement": "Require every active feature task envelope to record resolved role assignments with agent ID, model, reasoning effort, and whether the value came from the role default or a justified override."
+        },
+        {
+          "id": "CRM-023-R03",
+          "statement": "Validate role completeness, supported model/effort combinations, task-policy consistency, implementer/validator independence, and non-empty reasons for overrides."
+        },
+        {
+          "id": "CRM-023-R04",
+          "statement": "Update canonical role and adapter instructions so runtime delegation uses the persisted assignment and reports the actual model and reasoning effort used."
+        },
+        {
+          "id": "CRM-023-R05",
+          "statement": "Keep full project verification deterministic in this environment by syncing the locked UV environment and invoking its tools without the known hanging uv-run wrapper."
+        }
+      ],
+      "acceptance": [
+        {
+          "id": "CRM-023-AC01",
+          "criterion": "The persisted defaults are Sol/high for orchestrator, Terra/high for implementer, Sol/high for validator, and Luna/medium for explorer.",
+          "evidence": "Harness metadata and policy tests"
+        },
+        {
+          "id": "CRM-023-AC02",
+          "criterion": "The harness rejects missing roles, unsupported models or efforts, assignment/default mismatches, same-agent implementation and validation, and overrides without a reason.",
+          "evidence": "Isolated positive and negative harness fixtures"
+        },
+        {
+          "id": "CRM-023-AC03",
+          "criterion": "The active task records exact runtime assignments and delegated agents are launched with those model and reasoning overrides.",
+          "evidence": "Task envelope, orchestration record, and implementation/validation reports"
+        },
+        {
+          "id": "CRM-023-AC04",
+          "criterion": "Canonical role and adapter instructions require persisted assignments, justified deviations, and actual-runtime reporting.",
+          "evidence": "Contract inspection and focused tests"
+        },
+        {
+          "id": "CRM-023-AC05",
+          "criterion": "Running crm/init.sh terminates successfully and executes the complete project verification suite.",
+          "evidence": "Captured final init output"
+        }
+      ],
+      "out_of_scope": [
+        "Changing CRM business functionality",
+        "Calling the OpenAI API from the CRM application",
+        "Hard-coding credentials or account-specific identifiers"
+      ]
+    }
+  ]
+}

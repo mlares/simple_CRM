@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "feature_id": "CRM-016",
+  "requirement_ids": [
+    "CRM-016-R01",
+    "CRM-016-R02",
+    "CRM-016-R03",
+    "CRM-016-R04",
+    "CRM-016-R05",
+    "CRM-016-R06"
+  ],
+  "acceptance_ids": [
+    "CRM-016-AC01",
+    "CRM-016-AC02",
+    "CRM-016-AC03",
+    "CRM-016-AC04",
+    "CRM-016-AC05"
+  ],
+  "dependencies": ["CRM-005", "CRM-006", "CRM-007", "CRM-010", "CRM-011", "CRM-015"],
+  "allowed_scope": [
+    "README.md",
+    "crm/docs/architecture.md",
+    "crm/docs/conventions.md",
+    "crm/docs/verification.md",
+    "crm/docs/privacy.md",
+    "src/simple_crm/data_quality/models.py",
+    "src/simple_crm/data_quality/privacy.py",
+    "src/simple_crm/data_quality/migrations/0003_privacy_governance.py",
+    "tests/data_quality/test_privacy_governance.py",
+    "crm/progress/impl_CRM-016.md"
+  ],
+  "out_of_scope": [
+    "PROJECT_STATUS.html",
+    "crm/feature_list.json",
+    "crm/progress/current.md",
+    "crm/progress/history.md",
+    "crm/progress/tasks/CRM-016.json",
+    "crm/progress/validation_CRM-016.md",
+    "crm/AGENTS.md",
+    "crm/agents/",
+    "crm/adapters/",
+    "crm/harness.json",
+    "crm/scripts/",
+    "src/simple_crm/platform/",
+    "Providing legal advice",
+    "Clinical-record retention",
+    "CRM-017 worker infrastructure"
+  ],
+  "baseline_revision": "fcbe3b4ea14e155084019f9248a909826397d188",
+  "baseline_note": "Dirty completed-feature worktree after CRM-001 through CRM-015. Preserve all existing changes, PROJECT_STATUS.html, official vendored assets/licenses, and staged repository changes. CRM-016 owns privacy access/correction/suppression workflow, retention preview/approval, safe governance audit, and clinical-data guidance.",
+  "implementation_report": "progress/impl_CRM-016.md",
+  "validation_report": "progress/validation_CRM-016.md",
+  "implementer": "crm016_privacy_implementer_terra",
+  "validator": "crm016_privacy_validator_sol",
+  "agent_assignments": {
+    "orchestrator": {
+      "agent_id": "crm016_orchestrator_sol",
+      "model": "gpt-5.6-sol",
+      "reasoning_effort": "high",
+      "source": "role_default"
+    },
+    "implementer": {
+      "agent_id": "crm016_privacy_implementer_terra",
+      "model": "gpt-5.6-terra",
+      "reasoning_effort": "high",
+      "source": "role_default"
+    },
+    "validator": {
+      "agent_id": "crm016_privacy_validator_sol",
+      "model": "gpt-5.6-sol",
+      "reasoning_effort": "high",
+      "source": "role_default"
+    }
+  },
+  "architecture_decision": "Governance records are append-only and safe-by-construction. Privacy bundles expose related canonical/source/activity/export metadata only to audit-authorized identities, suppression remains durable on contact points, retention is preview-first with legal-hold exclusion and explicit approval, and no destructive clinical-data operation is introduced.",
+  "verification_commands": [
+    "timeout 60s ./crm/init.sh",
+    "PYTHONDONTWRITEBYTECODE=1 .venv/bin/ruff check .",
+    "PYTHONDONTWRITEBYTECODE=1 .venv/bin/ruff format --check .",
+    "PYTHONDONTWRITEBYTECODE=1 .venv/bin/mypy src",
+    "PYTHONDONTWRITEBYTECODE=1 .venv/bin/pytest -q",
+    "DJANGO_SETTINGS_MODULE=simple_crm.config.settings.test PYTHONDONTWRITEBYTECODE=1 .venv/bin/python manage.py check",
+    "DJANGO_SETTINGS_MODULE=simple_crm.config.settings.test PYTHONDONTWRITEBYTECODE=1 .venv/bin/python manage.py makemigrations --check --dry-run",
+    "PYTHONDONTWRITEBYTECODE=1 .venv/bin/pytest -q tests/data_quality/test_privacy_governance.py",
+    "git diff --check"
+  ]
+}

@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "feature_id": "CRM-002",
+  "requirement_ids": [
+    "CRM-002-R01",
+    "CRM-002-R02",
+    "CRM-002-R03",
+    "CRM-002-R04",
+    "CRM-002-R05"
+  ],
+  "acceptance_ids": [
+    "CRM-002-AC01",
+    "CRM-002-AC02",
+    "CRM-002-AC03",
+    "CRM-002-AC04"
+  ],
+  "dependencies": [
+    "CRM-001",
+    "CRM-023"
+  ],
+  "allowed_scope": [
+    ".env.example",
+    ".gitignore",
+    "README.md",
+    "manage.py",
+    "pyproject.toml",
+    "uv.lock",
+    "scripts/",
+    "src/simple_crm/",
+    "tests/",
+    "crm/docs/architecture.md",
+    "crm/docs/conventions.md",
+    "crm/docs/verification.md",
+    "crm/harness.json",
+    "crm/progress/impl_CRM-002.md"
+  ],
+  "out_of_scope": [
+    "crm/feature_list.json",
+    "crm/progress/current.md",
+    "crm/progress/history.md",
+    "crm/progress/tasks/CRM-002.json",
+    "crm/progress/validation_CRM-002.md",
+    "crm/AGENTS.md",
+    "crm/agents/",
+    "crm/adapters/",
+    "crm/scripts/harness_check.py",
+    "crm/tests/",
+    "src/simple_crm/__pycache__/",
+    "Business-domain models and migrations",
+    "Cloud deployment configuration"
+  ],
+  "baseline_revision": "fcbe3b4ea14e155084019f9248a909826397d188",
+  "baseline_note": "Resumed dirty worktree after CRM-023 completion. CRM-002 Django code is already persisted and direct verification passed 91 tests before the pause; finish clean-environment verification, implementation evidence, and validation while preserving all prior changes and the staged bytecode deletion.",
+  "implementation_report": "progress/impl_CRM-002.md",
+  "validation_report": "progress/validation_CRM-002.md",
+  "implementer": "crm002_orchestrator",
+  "validator": "crm002_foundation_validator",
+  "agent_assignments": {
+    "orchestrator": {
+      "agent_id": "crm002_orchestrator",
+      "model": "gpt-5.6-sol",
+      "reasoning_effort": "high",
+      "source": "role_default"
+    },
+    "implementer": {
+      "agent_id": "crm002_orchestrator",
+      "model": "gpt-5.6-sol",
+      "reasoning_effort": "high",
+      "source": "override",
+      "override_reason": "The runtime agent-thread limit prevented spawning or reactivating any Terra/high implementer; the existing Sol/high orchestrator executes the bounded revision sequentially before returning to orchestration."
+    },
+    "validator": {
+      "agent_id": "crm002_foundation_validator",
+      "model": "gpt-5.6-sol",
+      "reasoning_effort": "high",
+      "source": "role_default"
+    }
+  },
+  "verification_commands": [
+    "timeout 60s ./crm/init.sh",
+    "PYTHONDONTWRITEBYTECODE=1 .venv/bin/ruff check .",
+    "PYTHONDONTWRITEBYTECODE=1 .venv/bin/ruff format --check .",
+    "PYTHONDONTWRITEBYTECODE=1 .venv/bin/mypy src",
+    "PYTHONDONTWRITEBYTECODE=1 .venv/bin/pytest -q",
+    "PYTHONDONTWRITEBYTECODE=1 .venv/bin/python manage.py check",
+    "PYTHONDONTWRITEBYTECODE=1 .venv/bin/python manage.py makemigrations --check --dry-run",
+    "UV_CACHE_DIR=/tmp/uv-cache timeout 120s bash scripts/verify-clean.sh",
+    "git diff --check"
+  ]
+}

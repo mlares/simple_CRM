@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "feature_id": "CRM-NNN",
+  "requirement_ids": [
+    "CRM-NNN-R01"
+  ],
+  "acceptance_ids": [
+    "CRM-NNN-AC01"
+  ],
+  "dependencies": [],
+  "allowed_scope": [
+    "path/to/allowed/subsystem"
+  ],
+  "out_of_scope": [
+    "path/to/excluded/subsystem"
+  ],
+  "baseline_revision": "full-git-revision-or-recorded-worktree-baseline",
+  "implementation_report": "progress/impl_CRM-NNN.md",
+  "validation_report": "progress/validation_CRM-NNN.md",
+  "implementer": "independent-implementer-agent",
+  "validator": "independent-validator-agent",
+  "agent_assignments": {
+    "orchestrator": {
+      "agent_id": "orchestrator-agent",
+      "model": "gpt-5.6-sol",
+      "reasoning_effort": "high",
+      "source": "role_default"
+    },
+    "implementer": {
+      "agent_id": "independent-implementer-agent",
+      "model": "gpt-5.6-terra",
+      "reasoning_effort": "high",
+      "source": "role_default"
+    },
+    "validator": {
+      "agent_id": "independent-validator-agent",
+      "model": "gpt-5.6-sol",
+      "reasoning_effort": "high",
+      "source": "role_default"
+    },
+    "explorer": {
+      "agent_id": "optional-read-only-explorer-agent",
+      "model": "gpt-5.6-luna",
+      "reasoning_effort": "medium",
+      "source": "role_default"
+    }
+  },
+  "verification_commands": [
+    "cd crm && ./init.sh"
+  ]
+}

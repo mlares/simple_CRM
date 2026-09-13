@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "feature_id": "CRM-009",
+  "requirement_ids": [
+    "CRM-009-R01",
+    "CRM-009-R02",
+    "CRM-009-R03",
+    "CRM-009-R04",
+    "CRM-009-R05"
+  ],
+  "acceptance_ids": [
+    "CRM-009-AC01",
+    "CRM-009-AC02",
+    "CRM-009-AC03",
+    "CRM-009-AC04"
+  ],
+  "dependencies": ["CRM-007", "CRM-008"],
+  "allowed_scope": [
+    "README.md",
+    "crm/docs/architecture.md",
+    "crm/docs/conventions.md",
+    "crm/docs/verification.md",
+    "crm/docs/workspace.md",
+    "src/simple_crm/platform/views.py",
+    "src/simple_crm/platform/urls.py",
+    "src/simple_crm/platform/templates/platform/home.html",
+    "src/simple_crm/platform/templates/platform/today.html",
+    "src/simple_crm/platform/templates/platform/lead_detail.html",
+    "src/simple_crm/platform/workspace.py",
+    "tests/platform/test_workspace.py",
+    "crm/progress/impl_CRM-009.md"
+  ],
+  "out_of_scope": [
+    "PROJECT_STATUS.html",
+    "crm/feature_list.json",
+    "crm/progress/current.md",
+    "crm/progress/history.md",
+    "crm/progress/tasks/CRM-009.json",
+    "crm/progress/validation_CRM-009.md",
+    "crm/AGENTS.md",
+    "crm/agents/",
+    "crm/adapters/",
+    "crm/harness.json",
+    "crm/scripts/",
+    "src/simple_crm/identity/",
+    "src/simple_crm/data_quality/",
+    "src/simple_crm/reporting/",
+    "src/simple_crm/activity/",
+    "CRM-010 imports, CRM-012 search, CRM-013 filters, CRM-014 reports, CRM-017 notifications, and clinical identity records",
+    "User-programmable dashboards and gamification",
+    "Production data loading or workbook cutover"
+  ],
+  "baseline_revision": "fcbe3b4ea14e155084019f9248a909826397d188",
+  "baseline_note": "Dirty completed-feature worktree after CRM-001, CRM-023, CRM-002, CRM-003, CRM-004, CRM-005, CRM-007, and CRM-008. Preserve all existing changes, PROJECT_STATUS.html, official vendored assets/licenses, and the staged deletion of src/simple_crm/__pycache__/__init__.cpython-312.pyc. CRM-009 owns only the scoped Today workspace, lead detail presentation, navigation, urgency classification, and empty states.",
+  "implementation_report": "progress/impl_CRM-009.md",
+  "validation_report": "progress/validation_CRM-009.md",
+  "implementer": "crm009_workspace_implementer_terra",
+  "validator": "crm009_workspace_validator_sol",
+  "agent_assignments": {
+    "orchestrator": {
+      "agent_id": "crm009_orchestrator_sol",
+      "model": "gpt-5.6-sol",
+      "reasoning_effort": "high",
+      "source": "role_default"
+    },
+    "implementer": {
+      "agent_id": "crm009_workspace_implementer_terra",
+      "model": "gpt-5.6-terra",
+      "reasoning_effort": "high",
+      "source": "role_default"
+    },
+    "validator": {
+      "agent_id": "crm009_workspace_validator_sol",
+      "model": "gpt-5.6-sol",
+      "reasoning_effort": "high",
+      "source": "role_default"
+    }
+  },
+  "architecture_decision": "simple_crm.platform owns the server-rendered workspace and navigation presentation, but it reads only through scope-aware workspace queries. CRM-007 and CRM-008 remain the sole write boundaries for leads, interactions, and tasks. Today cards use explicit urgency classifications and the lead detail page composes party, lead, activity, stage, assignment, and next-task data without exposing database terminology or raw IDs.",
+  "verification_commands": [
+    "timeout 60s ./crm/init.sh",
+    "PYTHONDONTWRITEBYTECODE=1 .venv/bin/ruff check .",
+    "PYTHONDONTWRITEBYTECODE=1 .venv/bin/ruff format --check .",
+    "PYTHONDONTWRITEBYTECODE=1 .venv/bin/mypy src",
+    "PYTHONDONTWRITEBYTECODE=1 .venv/bin/pytest -q",
+    "DJANGO_SETTINGS_MODULE=simple_crm.config.settings.test PYTHONDONTWRITEBYTECODE=1 .venv/bin/python manage.py check",
+    "PYTHONDONTWRITEBYTECODE=1 .venv/bin/pytest -q tests/platform/test_workspace.py",
+    "git diff --check"
+  ]
+}

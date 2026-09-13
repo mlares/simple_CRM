@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+  <head>
+    {% load static %}
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description"
+          content="Trabajo pendiente y próximos pasos del equipo comercial.">
+    <title>Hoy — CRM de Ventas</title>
+    <link rel="stylesheet"
+          href="{% static 'vendor/bootstrap/5.3.8/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'platform/accessibility.css' %}">
+  </head>
+  <body class="bg-body-tertiary">
+    <a class="skip-link" href="#contenido">Saltar al contenido principal</a>
+    <header class="border-bottom bg-white">
+      <div class="container py-3">
+        <nav class="d-flex flex-wrap gap-3 align-items-center"
+             aria-label="Navegación principal">
+          <a class="fw-semibold text-decoration-none"
+             href="{% url 'platform:home' %}">CRM de Ventas</a>
+          {% for item in nav_items %}
+            {% if item.available %}
+              <a href="{{ item.url }}">{{ item.label }}</a>
+            {% else %}
+              <span class="text-secondary" aria-disabled="true">{{ item.label }}</span>
+            {% endif %}
+          {% endfor %}
+        </nav>
+      </div>
+    </header>
+    <main class="container py-4" id="contenido">
+      <div class="d-flex justify-content-between align-items-end mb-4">
+        <div>
+          <p class="text-secondary mb-1">{{ workspace.today|date:"l j \d\e F" }}</p>
+          <h1 class="h2 mb-0">{% if only_mine %}Mis leads{% else %}Hoy{% endif %}</h1>
+        </div>
+        <span class="badge text-bg-light">{{ workspace.items|length }} pendientes</span>
+      </div>
+      {% if workspace.items %}
+        <section class="row g-3" aria-label="Trabajo accionable">
+          {% for item in workspace.items %}
+            <div class="col-12 col-lg-6">
+              <article class="card h-100 shadow-sm">
+                <div class="card-body">
+                  <div class="d-flex justify-content-between gap-3">
+                    <div>
+                      <p class="small text-secondary mb-1">{{ item.title }}</p>
+                      <h2 class="h5"><a href="{% url 'platform:lead_detail' item.lead.lead_number %}">{{ item.lead.lead_number }}</a></h2>
+                    </div>
+                    {% if item.due_date %}<time datetime="{{ item.due_date|date:'Y-m-d' }}">{{ item.due_date|date:"j/m/Y" }}</time>{% endif %}
+                  </div>
+                  <p class="mb-0">{{ item.detail }}</p>
+                </div>
+              </article>
+            </div>
+          {% endfor %}
+        </section>
+      {% else %}
+        <section class="card border-0 shadow-sm" aria-label="Estado vacío">
+          <div class="card-body py-5 text-center">
+            <h2 class="h4">Todo en orden</h2>
+            <p class="mb-0">{{ workspace.empty_message }}</p>
+          </div>
+        </section>
+      {% endif %}
+      <p class="small text-secondary mt-4" id="proximamente">Las opciones que aún no están disponibles aparecerán aquí cuando estén listas.</p>
+    </main>
+    <script src="{% static 'vendor/htmx/2.0.10/htmx.min.js' %}" defer></script>
+  </body>
+</html>

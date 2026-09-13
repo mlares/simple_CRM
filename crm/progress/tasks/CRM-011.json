@@ -1,0 +1,91 @@
+{
+  "schema_version": 1,
+  "feature_id": "CRM-011",
+  "requirement_ids": [
+    "CRM-011-R01",
+    "CRM-011-R02",
+    "CRM-011-R03",
+    "CRM-011-R04",
+    "CRM-011-R05",
+    "CRM-011-R06"
+  ],
+  "acceptance_ids": [
+    "CRM-011-AC01",
+    "CRM-011-AC02",
+    "CRM-011-AC03",
+    "CRM-011-AC04",
+    "CRM-011-AC05"
+  ],
+  "dependencies": ["CRM-006", "CRM-007", "CRM-010"],
+  "allowed_scope": [
+    "README.md",
+    "crm/docs/architecture.md",
+    "crm/docs/conventions.md",
+    "crm/docs/verification.md",
+    "crm/docs/quality.md",
+    "src/simple_crm/data_quality/models.py",
+    "src/simple_crm/data_quality/services.py",
+    "src/simple_crm/data_quality/admin.py",
+    "src/simple_crm/data_quality/migrations/0002_quality_merge.py",
+    "tests/data_quality/test_quality_merge.py",
+    "crm/progress/impl_CRM-011.md"
+  ],
+  "out_of_scope": [
+    "PROJECT_STATUS.html",
+    "crm/feature_list.json",
+    "crm/progress/current.md",
+    "crm/progress/history.md",
+    "crm/progress/tasks/CRM-011.json",
+    "crm/progress/validation_CRM-011.md",
+    "crm/AGENTS.md",
+    "crm/agents/",
+    "crm/adapters/",
+    "crm/harness.json",
+    "crm/scripts/",
+    "src/simple_crm/identity/",
+    "src/simple_crm/reporting/",
+    "src/simple_crm/platform/",
+    "CRM-012 search, CRM-013 filters, CRM-014 reporting, CRM-016 privacy workflows, CRM-021 cutover, and clinical identity records",
+    "Fully automatic fuzzy entity resolution",
+    "Destructive deletion of merged source evidence",
+    "Production data loading or workbook cutover"
+  ],
+  "baseline_revision": "fcbe3b4ea14e155084019f9248a909826397d188",
+  "baseline_note": "Dirty completed-feature worktree after CRM-001, CRM-023, CRM-002, CRM-003, CRM-004, CRM-005, CRM-007, CRM-008, CRM-009, and CRM-010. Preserve all existing changes, PROJECT_STATUS.html, official vendored assets/licenses, and the staged deletion of src/simple_crm/__pycache__/__init__.cpython-312.pyc. CRM-011 owns quality queue, candidate evidence, and governed non-destructive merge only.",
+  "implementation_report": "progress/impl_CRM-011.md",
+  "validation_report": "progress/validation_CRM-011.md",
+  "implementer": "crm011_quality_implementer_terra",
+  "validator": "crm011_quality_validator_sol",
+  "agent_assignments": {
+    "orchestrator": {
+      "agent_id": "crm011_orchestrator_sol",
+      "model": "gpt-5.6-sol",
+      "reasoning_effort": "high",
+      "source": "role_default"
+    },
+    "implementer": {
+      "agent_id": "crm011_quality_implementer_terra",
+      "model": "gpt-5.6-terra",
+      "reasoning_effort": "high",
+      "source": "role_default"
+    },
+    "validator": {
+      "agent_id": "crm011_quality_validator_sol",
+      "model": "gpt-5.6-sol",
+      "reasoning_effort": "high",
+      "source": "role_default"
+    }
+  },
+  "architecture_decision": "Quality issues and match candidates remain reviewable records. Exact matching can create deterministic review candidates; fuzzy similarity can only create a REVIEW candidate with evidence and never mutates canonical records. An explicitly approved candidate is merged atomically by a steward service that redirects related links, preserves aliases/source lineage/suppression, archives the duplicate, and records before/after audit evidence.",
+  "verification_commands": [
+    "timeout 60s ./crm/init.sh",
+    "PYTHONDONTWRITEBYTECODE=1 .venv/bin/ruff check .",
+    "PYTHONDONTWRITEBYTECODE=1 .venv/bin/ruff format --check .",
+    "PYTHONDONTWRITEBYTECODE=1 .venv/bin/mypy src",
+    "PYTHONDONTWRITEBYTECODE=1 .venv/bin/pytest -q",
+    "DJANGO_SETTINGS_MODULE=simple_crm.config.settings.test PYTHONDONTWRITEBYTECODE=1 .venv/bin/python manage.py check",
+    "DJANGO_SETTINGS_MODULE=simple_crm.config.settings.test PYTHONDONTWRITEBYTECODE=1 .venv/bin/python manage.py makemigrations --check --dry-run",
+    "PYTHONDONTWRITEBYTECODE=1 .venv/bin/pytest -q tests/data_quality/test_quality_merge.py",
+    "git diff --check"
+  ]
+}

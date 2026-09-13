@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+  <head>
+    {% load static %}
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description"
+          content="Guía sencilla para trabajar en el CRM de Ventas.">
+    <title>Cómo trabajamos — CRM de Ventas</title>
+    <link rel="stylesheet"
+          href="{% static 'vendor/bootstrap/5.3.8/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'platform/accessibility.css' %}">
+  </head>
+  <body class="bg-body-tertiary">
+    <a class="skip-link" href="#contenido">Saltar al contenido principal</a>
+    <header class="border-bottom bg-white">
+      <div class="container py-3">
+        <nav class="d-flex flex-wrap gap-3 align-items-center"
+             aria-label="Navegación principal">
+          <a class="fw-semibold text-decoration-none"
+             href="{% url 'platform:home' %}">CRM de Ventas</a>
+          {% for item in nav_items %}
+            {% if item.available %}<a href="{{ item.url }}">{{ item.label }}</a>{% else %}<span class="text-secondary" aria-disabled="true">{{ item.label }}</span>{% endif %}
+          {% endfor %}
+        </nav>
+      </div>
+    </header>
+    <main id="contenido" class="container py-4">
+      <p class="text-secondary mb-1">Ayuda contextual</p>
+      <h1 class="h2">Cómo trabajamos</h1>
+      <p class="lead">Una guía breve para registrar el trabajo comercial con datos claros y trazables.</p>
+      <div class="row g-4">
+        <section class="col-12 col-lg-6" aria-labelledby="today-title">
+          <article class="card h-100 shadow-sm">
+            <div class="card-body">
+              <h2 id="today-title" class="h4">Hoy y los leads</h2>
+              <p>En <a href="{% url 'platform:today' %}">Hoy</a> aparecen tus próximos pasos. Abrí un lead para revisar su etapa, responsable, origen y línea de tiempo.</p>
+              <p class="mb-0">Trabajá con la información visible para tu alcance. Si falta un dato, dejá una tarea o un motivo explícito.</p>
+            </div>
+          </article>
+        </section>
+        <section class="col-12 col-lg-6" aria-labelledby="contact-title">
+          <article class="card h-100 shadow-sm">
+            <div class="card-body">
+              <h2 id="contact-title" class="h4">Registrar un contacto</h2>
+              <p>Elegí el canal, resultado y dirección del contacto. Escribí qué ocurrió; “sin acción” no es un evento comercial.</p>
+              <p class="mb-0">Cuando corresponda, agregá la próxima tarea con una descripción y fecha. El contacto, la tarea y el cambio de etapa se guardan juntos.</p>
+            </div>
+          </article>
+        </section>
+        <section class="col-12 col-lg-6" aria-labelledby="search-title">
+          <article class="card h-100 shadow-sm">
+            <div class="card-body">
+              <h2 id="search-title" class="h4">Buscar y guardar vistas</h2>
+              <p>Usá <a href="{% url 'platform:search' %}">Buscar</a> para nombre, correo, teléfono o nota autorizada. Los resultados respetan tu alcance.</p>
+              <p class="mb-0">En <a href="{% url 'platform:segments' %}">Segmentos</a> combiná filtros guiados y restablecelos cuando termines. Las vistas compartidas siguen siendo gobernadas.</p>
+            </div>
+          </article>
+        </section>
+        <section class="col-12 col-lg-6" aria-labelledby="quality-title">
+          <article class="card h-100 shadow-sm">
+            <div class="card-body">
+              <h2 id="quality-title" class="h4">Calidad de datos</h2>
+              <p>Las coincidencias dudosas se revisan antes de fusionar. Conservá el origen y no copies datos clínicos o identificadores de pacientes.</p>
+              <p class="mb-0">Si ves un dato incorrecto, informalo al responsable de datos con el contexto necesario, sin pegar archivos o secretos en una nota.</p>
+            </div>
+          </article>
+        </section>
+      </div>
+      <section class="card shadow-sm mt-4" aria-labelledby="glossary-title">
+        <div class="card-body">
+          <h2 id="glossary-title" class="h4">Glosario</h2>
+          <dl class="row mb-0">
+            <dt class="col-sm-3">Lead</dt>
+            <dd class="col-sm-9">
+              Oportunidad o seguimiento comercial dentro de una campaña.
+            </dd>
+            <dt class="col-sm-3">Etapa</dt>
+            <dd class="col-sm-9">
+              Estado comercial gobernado del seguimiento.
+            </dd>
+            <dt class="col-sm-3">Tarea</dt>
+            <dd class="col-sm-9">
+              Próximo paso concreto con responsable y fecha.
+            </dd>
+            <dt class="col-sm-3">Vista</dt>
+            <dd class="col-sm-9">
+              Consulta guardada con filtros permitidos, sin SQL libre.
+            </dd>
+            <dt class="col-sm-3">Alcance</dt>
+            <dd class="col-sm-9">
+              Campañas, equipos o registros que una identidad puede consultar.
+            </dd>
+          </dl>
+        </div>
+      </section>
+    </main>
+    <script src="{% static 'vendor/htmx/2.0.10/htmx.min.js' %}" defer></script>
+  </body>
+</html>
